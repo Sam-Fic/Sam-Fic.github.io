@@ -407,7 +407,6 @@ section:last-of-type {
     padding: 2rem;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     transition: all 0.2s ease-out;
 }
 .project-card:hover {
@@ -448,6 +447,7 @@ section:last-of-type {
 }
 
 .project-link {
+    margin-top: auto;
     align-self: flex-start;
     display: inline-flex;
     align-items: center;
