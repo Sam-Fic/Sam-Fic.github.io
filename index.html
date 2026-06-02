@@ -68,8 +68,8 @@
             <h1 lang="zh">你好，这里是 <span>Sam-Fic</span></h1>
             <h1 lang="en">Hi, <span>Sam-Fic</span> here</h1>
             
-            <p class="hero-subtitle" lang="zh">全栈探索中 / 视觉与嵌入式开发 / 喜欢贝斯 & 金属核</p>
-            <p class="hero-subtitle" lang="en">Full-stack Exploring / Vision & Embedded Developer / Like Bass & metalcore</p>
+            <p class="hero-subtitle" lang="zh">全栈探索中 / 机器视觉与强化学习 / 喜欢贝斯 & 金属核</p>
+            <p class="hero-subtitle" lang="en">Full-stack Exploring / Machine Vision & Reinforcement Learning / Like Bass & metalcore</p>
             
             <div class="contact-links">
                 <a href="javascript:void(0)" onclick="copyToClipboard(this, 'samfic@foxmail.com')" class="btn-contact btn-email" data-copied="false">
@@ -108,11 +108,11 @@
                 <div>
                     <h3 lang="zh">强化学习机器乌龟</h3>
                     <h3 lang="en">Turtle RL Locomotion</h3>
-                    <p lang="zh">基于 Mujoco 仿真环境与 Stable-Baselines3 框架的机器乌龟强化学习系统。尝试在不参考真实乌龟爬行方式的前提下，通过强化学习算法探索适合机器乌龟的爬行姿态。</p>
+                    <p lang="zh">基于 MuJoCo 仿真环境与 Stable-Baselines3 框架的机器乌龟强化学习系统。尝试在不参考真实乌龟爬行方式的前提下，通过强化学习算法探索适合机器乌龟的爬行姿态。</p>
                     <p lang="en">A reinforcement learning system for robotic turtles based on the MuJoCo simulation environment and the Stable-Baselines3 framework. This system attempts to discover optimal crawling postures for robotic turtles through reinforcement learning algorithms, without relying on any reference data from real turtle movements.</p>
                 </div>
                 <a href="https://github.com/Sam-Fic/turtle-rl-locomotion" target="_blank" class="project-link">
-                    <i class="fab fa-github"></i> <i class="fas fa-code-branch" style="margin-left: 3px; font-size: 0.9em; opacity: 1;"></i> GitHub <span class="arrow"></span>&rarr;</span>
+                    <i class="fab fa-github"></i> <i class="fas fa-code-branch" style="margin-left: 3px; font-size: 0.9em; opacity: 1;"></i> GitHub <span class="arrow"></span>&rarr;
                 </a>
             </div>
 
@@ -129,7 +129,7 @@
                     <p lang="en">Arduino-based RC control system for multi-actuator control (propulsion motor, linear actuator, servos), featuring modular design, signal anti-interference optimization, and safe boot mechanism.</p>
                 </div>
                 <a href="https://gitee.com/samfic/uav_control" target="_blank" class="project-link">
-                    <i class="fab fa-git-alt"></i> Gitee <span class="arrow"></span>&rarr;</span>
+                    <i class="fab fa-git-alt"></i> Gitee <span class="arrow"></span>&rarr;
                 </a>
             </div>
 
@@ -147,7 +147,7 @@
                     It provides a checkable directory tree, flexible organization list, text insertion and automatic encoding detection, making it ideal for quickly consolidating key code or documents from a project into a single TXT file for further analysis or submission to large language models.</p>
                 </div>
                 <a href="https://github.com/Sam-Fic/filecollector-gnome" target="_blank" class="project-link">
-                    <i class="fab fa-github"></i> GitHub <span class="arrow"></span>&rarr;</span>
+                    <i class="fab fa-github"></i> GitHub <span class="arrow"></span>&rarr;
                 </a>
             </div>
         </div>
@@ -159,8 +159,43 @@
             <span lang="zh">项目经历</span>
             <span lang="en">Experience</span>
         </h2>
+
         <div class="experience-list">
+
+            <div class="experience-card">
+                <!-- 左侧图片 -->
+                <div class="exp-image">
+                    <!-- 替换 src 为你的真实图片路径，如果没有，这里会显示文字占位符 -->
+                    <img src="assets/images/robocon-2026.png" alt="第二十五届全国大学生机器人大赛 ROBOCON"
+                        style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <!-- 右侧信息 -->
+                <div class="exp-info">
+                    <div>
+                        <h3 class="exp-title" lang="zh">第二十五届全国大学生机器人大赛 ROBOCON</h3>
+                        <h3 class="exp-title" lang="en">25th National College Student Robot Competition ROBOCON</h3>
             
+                        <!-- 时间 (橙色) -->
+                        <time class="exp-time">
+                            <span lang="zh">2026 年 7 月（预计）</span>
+                            <span lang="en">Jul 2026 (expected)</span>
+                        </time>
+            
+                        <p class="exp-desc" lang="zh">
+                            主导激光雷达模块的开发。基于 MID-360 激光雷达硬件平台，采用 ROS2 系统架构，整合 FastLIO SLAM 算法实现 3D 点云地图构建，并通过 ICP
+                            算法完成机器人实时重定位，为赛场机器人提供可靠的定位信息。
+                        </p>
+                        <p class="exp-desc" lang="en">
+                            Spearheading LiDAR module development. Built upon the MID-360 LiDAR hardware platform with ROS2
+                            architecture, integrated FastLIO SLAM algorithm for 3D point cloud mapping, and implemented real-time
+                            robot relocalization via ICP algorithm, providing localization support for arena robots.
+                        </p>
+                    </div>
+                    <!-- 如果需要链接，可以在这里加一个箭头按钮 -->
+                    <!-- <a href="#" class="project-link" style="align-self: flex-start; margin-top: 1rem;"><span lang="zh">查看详情</span><span lang="en">View Details</span> &rarr;</a> -->
+                </div>
+            </div>
+    
             <!-- 经历卡片 1 -->
             <div class="experience-card">
                 <!-- 左侧图片 -->
@@ -181,10 +216,10 @@
                         </time>
                         
                         <p class="exp-desc" lang="zh">
-                            主导激光雷达模块的开发。基于 MID-360 激光雷达硬件平台，采用 ROS2 系统架构，整合 FastLIO SLAM 算法实现 3D 点云地图构建，并通过 ICP 算法完成机器人实时重定位，为赛场机器人提供可靠的定位信息。
+                            响应低空经济发展需求，设计无人机及爬缆装置。提出可飞行可悬挂的电力巡检无人机方案。使用 Arduino 单片机及独立遥控器构建控制系统，实现无人机上层主动悬挂机构的闭环控制。
                         </p>
                         <p class="exp-desc" lang="en">
-                            Spearheading LiDAR module development. Built upon the MID-360 LiDAR hardware platform with ROS2 architecture, integrated FastLIO SLAM algorithm for 3D point cloud mapping, and implemented real-time robot relocalization via ICP algorithm, providing localization support for arena robots.
+                            In response to the development needs of the low-altitude economy, a drone and cable-climbing device were designed. A novel solution involving a flight-capable drone with suspended operation capabilities was proposed for power line inspection tasks. An control system based on an Arduino microcontroller and a dedicated remote controller was developed to achieve closed-loop control of the drone’s upper-layer active suspension mechanism.
                         </p>
                     </div>
                     <!-- 如果需要链接，可以在这里加一个箭头按钮 -->
@@ -202,7 +237,7 @@
                 <!-- 右侧信息 -->
                 <div class="exp-info">
                     <div>
-                        <h3 class="exp-title" lang="zh">2025 年福建省大学生机器人大赛暨海峡两岸大学生机器人竞赛与工程交流会</h3>
+                        <h3 class="exp-title" lang="zh">2025 年福建省大学生机器人大赛</h3>
                         <h3 class="exp-title" lang="en">2025 Fujian Provincial College Students’ Robotics Competition & Cross-Strait Robotics Contest and Engineering Exchange Conference</h3>
                         
                         <!-- 时间 (橙色) -->
@@ -227,29 +262,23 @@
                 <!-- 左侧图片 -->
                 <div class="exp-image">
                     <!-- 替换 src 为你的真实图片路径，如果没有，这里会显示文字占位符 -->
-                    <img src="assets/images/robocon-2025.png" alt="第二十四届全国大学生机器人大赛 ROBOCON"
+                    <img src="assets/images/XMU-drone-delivery.gif" alt="厦门大学校园无人机配送项目"
                         style="width: 100%; height: 100%; object-fit: cover;">
                 </div>
                 <!-- 右侧信息 -->
                 <div class="exp-info">
                     <div>
-                        <h3 class="exp-title" lang="zh">第二十四届全国大学生机器人大赛 ROBOCON</h3>
-                        <h3 class="exp-title" lang="en">24th National College Student Robot Competition ROBOCON</h3>
-            
-                        <!-- 时间 (橙色) -->
-                        <time class="exp-time">
-                            <span lang="zh">2025 年 6 月</span>
-                            <span lang="en">Jun 2025</span>
-                        </time>
-            
+                        <h3 class="exp-title" lang="zh">厦门大学校园无人机配送项目</h3>
+                        <h3 class="exp-title" lang="en">Xiamen University Campus Drone Delivery Project</h3>
+                        
                         <p class="exp-desc" lang="zh">
-                            主导激光雷达模块的开发。基于 MID-360 激光雷达硬件平台，采用 ROS2 系统架构，整合 FastLIO SLAM 算法实现 3D 点云地图构建，并通过 ICP
-                            算法完成机器人实时重定位，为赛场机器人提供可靠的定位信息。
+                            负责第二版无人机外形设计，优化八轴无人机的机架及舵机安装位置，将碳管排布设计为叠放式、舵机安装为上下交错型，减少机架所需碳管材料的加工次数、避免了旋翼之间的干涉并提升了整机强度。
                         </p>
                         <p class="exp-desc" lang="en">
-                            Spearheading LiDAR module development. Built upon the MID-360 LiDAR hardware platform with ROS2
-                            architecture, integrated FastLIO SLAM algorithm for 3D point cloud mapping, and implemented real-time
-                            robot relocalization via ICP algorithm, providing localization support for arena robots.
+                            Responsible for the second-generation drone design: optimized the frame structure and servo mounting layout of the
+                            octocopter. Designed carbon tubes to be stacked vertically and arranged servos in a staggered top-bottom configuration,
+                            thereby reducing the number of required carbon tube processing steps, preventing interference between propellers, and
+                            enhancing overall structural strength.
                         </p>
                     </div>
                     <!-- 如果需要链接，可以在这里加一个箭头按钮 -->
@@ -261,29 +290,24 @@
                 <!-- 左侧图片 -->
                 <div class="exp-image">
                     <!-- 替换 src 为你的真实图片路径，如果没有，这里会显示文字占位符 -->
-                    <img src="assets/images/future-flight-2024.png" alt="&ldquo;畅行天地，逐梦未来&rdquo; 第十届中国研究生未来飞行器创新大赛"
+                    <img src="assets/images/microcontroller-applications.gif" alt="自然语言控制无人机飞行行为课程设计"
                         style="width: 100%; height: 100%; object-fit: cover;">
                 </div>
                 <!-- 右侧信息 -->
                 <div class="exp-info">
                     <div>
-                        <h3 class="exp-title" lang="zh">“畅行天地，逐梦未来” 第十届中国研究生未来飞行器创新大赛</h3>
-                        <h3 class="exp-title" lang="en">“Seamless Travel through Air and Space, Chasing Dreams of the Future” – The 10th China Graduate Future Flight Vehicle Innovation Competition</h3>
-            
-                        <!-- 时间 (橙色) -->
-                        <time class="exp-time">
-                            <span lang="zh">2024 年 11 月</span>
-                            <span lang="en">Nov 2024</span>
-                        </time>
+                        <h3 class="exp-title" lang="zh">自然语言控制无人机飞行行为课程设计</h3>
+                        <h3 class="exp-title" lang="en">Course Design: Natural Language-Based Control of Drone Flight Behaviors
+                        </h3>
             
                         <p class="exp-desc" lang="zh">
-                            主导激光雷达模块的开发。基于 MID-360 激光雷达硬件平台，采用 ROS2 系统架构，整合 FastLIO SLAM 算法实现 3D 点云地图构建，并通过 ICP
-                            算法完成机器人实时重定位，为赛场机器人提供可靠的定位信息。
+                            灵感来自启智社区 LLM 微调开源项目。通过调用 tello 官方提供的 Python 控制 API，调用 LLM 将自然语言转换为格式化的控制指令并加以语法检查和超时防护等特性，实现利用自然语言控制 tello 无人机的飞行行为。
                         </p>
                         <p class="exp-desc" lang="en">
-                            Spearheading LiDAR module development. Built upon the MID-360 LiDAR hardware platform with ROS2
-                            architecture, integrated FastLIO SLAM algorithm for 3D point cloud mapping, and implemented real-time
-                            robot relocalization via ICP algorithm, providing localization support for arena robots.
+                            Inspired by open-source projects on LLM fine-tuning within the Qizhi Community, this project leverages the official
+                            Python control API provided by Tello. It employs an LLM to convert natural language inputs into structured control
+                            commands, while integrating syntax validation and timeout protection mechanisms, thus enabling intuitive natural
+                            language control over Tello drone flight behaviors.
                         </p>
                     </div>
                     <!-- 如果需要链接，可以在这里加一个箭头按钮 -->
@@ -307,7 +331,7 @@
                 <h3 lang="en">Robotics & Engineering</h3>
                 <div class="tag-list">
                     <span class="tag">SolidWorks</span>
-                    <span class="tag">Mujoco</span>
+                    <span class="tag">MuJoCo</span>
                     <span class="tag">ROS2</span>
                 </div>
             </div>
