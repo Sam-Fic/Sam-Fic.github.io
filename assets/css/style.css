@@ -446,6 +446,13 @@ section:last-of-type {
     object-fit: cover;
 }
 
+.project-links {
+    margin-top: auto;
+    align-self: flex-start;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
 .project-link {
     margin-top: auto;
     align-self: flex-start;
