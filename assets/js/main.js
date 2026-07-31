@@ -113,3 +113,33 @@ if (progressBar) {
         progressBar.style.width = scrollPercent + '%';
     });
 }
+
+/* 图片加载遮罩：加载完成前持续播放 spinner；加载完成时等当前循环播完再完整擦除收尾 */
+(function () {
+    document.querySelectorAll('.img-loader').forEach(function (container) {
+        const img = container.querySelector('img');
+        const cover = container.querySelector('.img-cover');
+        if (!img || !cover) return;
+
+        let loaded = false;
+
+        function finish() {
+            loaded = true;
+        }
+
+        if (img.complete) {
+            finish();
+        } else {
+            img.addEventListener('load', finish);
+            img.addEventListener('error', finish);
+        }
+
+        // 图片加载完成后，等当前这一个完整周期（出现→消失）播完再隐藏遮罩，避免跳帧
+        cover.addEventListener('animationiteration', function () {
+            if (loaded) {
+                cover.classList.add('done');
+                cover.removeEventListener('animationiteration', arguments.callee);
+            }
+        });
+    });
+})();
