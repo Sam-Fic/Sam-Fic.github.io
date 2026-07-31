@@ -370,6 +370,36 @@
                 </div>
             </div>
 
+            <!-- 经历卡片 7 -->
+            <div class="experience-card">
+                <!-- 左侧图片 -->
+                <div class="exp-image">
+                    <!-- 替换 src 为你的真实图片路径，如果没有，这里会显示文字占位符 -->
+                    <img src="assets/images/flightgear_screenshot.jpg" alt="飞行控制综合实验"
+                        style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <!-- 右侧信息 -->
+                <div class="exp-info">
+                    <div>
+                        <h3 class="exp-title" lang="zh">飞行控制综合实验</h3>
+                        <h3 class="exp-title" lang="en">Integrated Flight Control Experiment</h3>
+            
+                        <p class="exp-desc" lang="zh">
+                            在 Matlab/Simulink 中建立六自由度刚体模型，用根轨迹法整定俯仰、迎角与横航向三通道控制增益，并设计三阶段着陆制导与蒙特卡洛敏感度分析；将 Simulink 模型移植为 C 代码，实现内外环级联 PID、四边航路制导与抗积分饱和，并借助 FlightGear 进行三维可视化；把 C 仿真进一步移植到 STM32，通过串口私有协议与 PC 端构成硬件在环（HIL）仿真系统。
+                        </p>
+                        <p class="exp-desc" lang="en">
+                            A six-degree-of-freedom rigid-body model is built in Matlab/Simulink, where pitch, angle-of-attack and lateral-directional
+                            loop gains are tuned via root-locus design, together with three-phase landing guidance and Monte-Carlo sensitivity
+                            analysis. The Simulink model is then ported to C, realizing cascaded inner/outer-loop PIDs, a four-leg waypoint navigator
+                            and anti-windup saturation, with 3D visualization in FlightGear. The C simulation is further migrated onto an STM32,
+                            forming a hardware-in-the-loop (HIL) system that communicates with a PC host through a custom serial protocol.
+                        </p>
+                    </div>
+                    <!-- 如果需要链接，可以在这里加一个箭头按钮 -->
+                    <!-- <a href="#" class="project-link" style="align-self: flex-start; margin-top: 1rem;"><span lang="zh">查看详情</span><span lang="en">View Details</span> &rarr;</a> -->
+                </div>
+            </div>
+
         </div>
     </section>
 
@@ -433,7 +463,7 @@
             <span lang="en">About Me</span>
         </h2>
         <div class="about-content">
-            <p lang="zh">你好！这里是 Sam-Fic。我喜欢绘画和音乐。<strong>重型贝斯（最喜欢的音乐人是 Virtual Riot） / 金属核（最喜欢的乐队是 Wind Walkers）音乐重度爱好者</strong>，喜欢<strong>虚拟歌手</strong>技术与文化（头像是嫣汐:D），喜欢学习语言。虽然我是工科出身，但其实我的梦想是做 UI/UX 设计师。</p>
+            <p lang="zh">你好！这里是 Sam-Fic。我喜欢绘画和音乐。<strong>重型贝斯（最喜欢的音乐人是 Virtual Riot） / 金属核（最喜欢的乐队是 Wind Walkers）音乐重度爱好者</strong>，喜欢<strong>虚拟歌手</strong>技术与文化（头像是嫣汐:D），喜欢学习语言。虽然我是工科出身，但我的梦想是做 UI/UX 设计师。</p>
             <p lang="en">Hi! Sam-Fic here. I'm into drawing and music. A huge fan of <strong>Drum & Bass (favorite artist is Virtual Riot)</strong> and <strong>metalcore (favorite band is Wind Walkers)</strong>, really passionate about <strong>Vocaloid</strong> technology and culture (my avatar is Yanxi :D), and love learning languages. Even though I studied engineering, my dream is to be a UI/UX designer.</p>
         </div>
     </section>
