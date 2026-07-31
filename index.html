@@ -99,81 +99,113 @@
             <span lang="zh">开源项目</span>
             <span lang="en">Open Source</span>
         </h2>
-        <div class="project-grid">
-            <!-- 卡片 1 -->
-            <div class="project-card">
-                <div class="project-image">
-                    <img src="assets/images/turtle.gif" alt="强化学习机器乌龟" style="width: 100%; height: 100%; object-fit: cover;">
+        <!-- 软件类 -->
+        <div class="project-group">
+            <h3 class="project-category-title">
+                <span lang="zh"><i class="fas fa-laptop-code"></i> 软件</span>
+                <span lang="en"><i class="fas fa-laptop-code"></i> Software</span>
+            </h3>
+            <div class="project-grid">
+                <!-- 卡片 1 -->
+                <div class="project-card">
+                    <div class="project-image">
+                        <img src="assets/images/fliecollector.png" alt="FileCollector" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                    <div>
+                        <h3 lang="zh">FileCollector</h3>
+                        <h3 lang="en">FileCollector</h3>
+                        <p lang="zh">FileCollector 是一款跨平台的桌面小工具，用于高效收集、编排工作目录中的文件并生成合并文本。
+                        它提供了可勾选的目录树、灵活的编排列表、文字插入和编码自动检测，非常适合将项目中的关键代码或文档快速整合成一个 TXT 文件，供后续分析或提交给大语言模型使用。配套有 CLI 与 MCP 服务，可实现自动化操作。</p>
+                        <p lang="en">FileCollector is a cross-platform desktop utility designed for efficiently gathering and organizing files from
+                        working directories into a single merged text file.
+                        It features a checkable directory tree, a flexible organization list, text insertion capabilities, and automatic
+                        encoding detection—making it ideal for quickly consolidating important code snippets or documents from a project into
+                        one TXT file for further analysis or use with large language models.
+                        Additionally, FileCollector offers both a Command-Line Interface (CLI) and an MCP service to enable automated workflows.</p>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/Sam-Fic/filecollector" target="_blank" class="project-link">
+                            <i class="fab fa-github"></i> <span lang="zh">跨平台版本（GTK + Libadwaita）</span><span lang="en">Cross-platform(GTK + Libadwaita)</span> <span class="arrow"></span>&rarr;
+                        </a>
+                        <a href="https://github.com/Sam-Fic/filecollector-flet" target="_blank" class="project-link">
+                            <i class="fab fa-github"></i> <span lang="zh">跨平台版本（Flet）</span><span lang="en">Cross-platform(Flet)</span> <span class="arrow"></span>&rarr;
+                        </a>
+                    </div>
                 </div>
-                <div>
-                    <h3 lang="zh">强化学习机器乌龟</h3>
-                    <h3 lang="en">Turtle RL Locomotion</h3>
-                    <p lang="zh">基于 MuJoCo 仿真环境与 Stable-Baselines3 框架的机器乌龟强化学习系统。尝试在不参考真实乌龟爬行方式的前提下，通过强化学习算法探索适合机器乌龟的爬行姿态。</p>
-                    <p lang="en">A reinforcement learning system for robotic turtles based on the MuJoCo simulation environment and the Stable-Baselines3 framework. This system attempts to discover optimal crawling postures for robotic turtles through reinforcement learning algorithms, without relying on any reference data from real turtle movements.</p>
-                </div>
-                <a href="https://github.com/Sam-Fic/turtle-rl-locomotion" target="_blank" class="project-link">
-                    <i class="fab fa-github"></i> <i class="fas fa-code-branch" style="margin-left: 3px; font-size: 0.9em; opacity: 1;"></i> GitHub <span class="arrow"></span>&rarr;
-                </a>
-            </div>
 
-            <!-- 卡片 2 -->
-            <div class="project-card">
-                <div class="project-image">
-                    <img src="assets/images/uav.png" alt="UAV / 船模综合遥控系统" style="width: 100%; height: 100%; object-fit: cover;">
-                </div>
-                <div>
-                    <h3 lang="zh">电网无人机上层机构遥控系统</h3>
-                    <h3 lang="en">Power Grid UAV Top-level RC System
-                    </h3>
-                    <p lang="zh">基于 Arduino 的遥控控制系统，实现多执行机构控制（推进电机、推杆、舵机），具备模块化设计、信号抗干扰优化及安全启动机制。</p>
-                    <p lang="en">Arduino-based RC control system for multi-actuator control (propulsion motor, linear actuator, servos), featuring modular design, signal anti-interference optimization, and safe boot mechanism.</p>
-                </div>
-                <a href="https://gitee.com/samfic/uav_control" target="_blank" class="project-link">
-                    <i class="fab fa-git-alt"></i> Gitee <span class="arrow"></span>&rarr;
-                </a>
-            </div>
-
-            <!-- 卡片 3 -->
-            <div class="project-card">
-                <div class="project-image">
-                    <img src="assets/images/fliecollector.png" alt="FileCollector" style="width: 100%; height: 100%; object-fit: contain;">
-                </div>
-                <div>
-                    <h3 lang="zh">FileCollector</h3>
-                    <h3 lang="en">FileCollector</h3>
-                    <p lang="zh">FileCollector 是一款跨平台的桌面小工具，用于高效收集、编排工作目录中的文件并生成合并文本。
-                    它提供了可勾选的目录树、灵活的编排列表、文字插入和编码自动检测，非常适合将项目中的关键代码或文档快速整合成一个 TXT 文件，供后续分析或提交给大语言模型使用。配套有 CLI 与 MCP 服务，可实现自动化操作。</p>
-                    <p lang="en">FileCollector is a cross-platform desktop utility designed for efficiently gathering and organizing files from
-                    working directories into a single merged text file.
-                    It features a checkable directory tree, a flexible organization list, text insertion capabilities, and automatic
-                    encoding detection—making it ideal for quickly consolidating important code snippets or documents from a project into
-                    one TXT file for further analysis or use with large language models.
-                    Additionally, FileCollector offers both a Command-Line Interface (CLI) and an MCP service to enable automated workflows.</p>
-                </div>
-                <div class="project-links">
-                    <a href="https://github.com/Sam-Fic/filecollector-gnome" target="_blank" class="project-link">
-                        <i class="fab fa-github"></i> <span lang="zh">for GNOME</span><span lang="en">for GNOME</span> <span class="arrow"></span>&rarr;
-                    </a>
-                    <a href="https://github.com/Sam-Fic/filecollector" target="_blank" class="project-link">
-                        <i class="fab fa-github"></i> <span lang="zh">跨平台版本</span><span lang="en">Cross-platform</span> <span class="arrow"></span>&rarr;
+                <!-- 卡片 2 -->
+                <div class="project-card">
+                    <div class="project-image">
+                        <img src="assets/images/szyszka.png" alt="Szyszka" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                    <div>
+                        <h3 lang="zh">Szyszka</h3>
+                        <h3 lang="en">Szyszka</h3>
+                        <p lang="zh">基于 GTK 4 和 Libadwaita 重写的批量文件重命名工具，支持正则表达式替换、文本修剪、编号、大小写转换等丰富规则，可跨平台运行于 Linux、macOS 和 Windows。</p>
+                        <p lang="en">A bulk file renamer rewritten with GTK 4 and Libadwaita, featuring rich rules like regex replacement, text trimming, numbering, case conversion, and more. Cross-platform support for Linux, macOS, and Windows.</p>
+                    </div>
+                    <a href="https://github.com/Sam-Fic/szyszka" target="_blank" class="project-link">
+                        <i class="fab fa-github"></i> <i class="fas fa-code-branch" style="margin-left: 3px; font-size: 0.9em; opacity: 1;"></i> GitHub <span class="arrow"></span>&rarr;
                     </a>
                 </div>
-            </div>
 
-            <!-- 卡片 4 -->
-            <div class="project-card">
-                <div class="project-image">
-                    <img src="assets/images/szyszka.png" alt="Szyszka" style="width: 100%; height: 100%; object-fit: contain;">
+                <!-- 卡片 3 -->
+                <div class="project-card">
+                    <div class="project-image">
+                        <img src="assets/images/setzer-screenshot.png" alt="Setzer" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                    <div>
+                        <h3 lang="zh">Setzer</h3>
+                        <h3 lang="en">Setzer</h3>
+                        <p lang="zh">基于 Python 与 GTK 开发的 LaTeX 编辑器，支持 Linux 与 Windows 双平台。提供语法高亮、PDF 预览、符号侧边栏、自动补全等丰富功能，并可通过 meson 构建或直接运行开发版本。</p>
+                        <p lang="en">A LaTeX editor written in Python with GTK, supporting both Linux and Windows. It features syntax highlighting, PDF preview, a symbol sidebar, autocompletion, and more. Can be built with meson or run directly in development mode.</p>
+                    </div>
+                    <a href="https://github.com/Sam-Fic/Setzer" target="_blank" class="project-link">
+                        <i class="fab fa-github"></i> <i class="fas fa-code-branch" style="margin-left: 3px; font-size: 0.9em; opacity: 1;"></i> GitHub <span class="arrow"></span>&rarr;
+                    </a>
                 </div>
-                <div>
-                    <h3 lang="zh">Szyszka</h3>
-                    <h3 lang="en">Szyszka</h3>
-                    <p lang="zh">基于 GTK 4 和 libadwaita 重写的批量文件重命名工具，支持正则表达式替换、文本修剪、编号、大小写转换等丰富规则，可跨平台运行于 Linux、macOS 和 Windows。</p>
-                    <p lang="en">A bulk file renamer rewritten with GTK 4 and libadwaita, featuring rich rules like regex replacement, text trimming, numbering, case conversion, and more. Cross-platform support for Linux, macOS, and Windows.</p>
+            </div>
+        </div>
+
+        <!-- 硬件类 -->
+        <div class="project-group">
+            <h3 class="project-category-title">
+                <span lang="zh"><i class="fas fa-microchip"></i> 工程</span>
+                <span lang="en"><i class="fas fa-microchip"></i> Engineering</span>
+            </h3>
+            <div class="project-grid">
+                <!-- 卡片 4 -->
+                <div class="project-card">
+                    <div class="project-image">
+                        <img src="assets/images/turtle.gif" alt="强化学习机器乌龟" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div>
+                        <h3 lang="zh">强化学习机器乌龟</h3>
+                        <h3 lang="en">Turtle RL Locomotion</h3>
+                        <p lang="zh">基于 MuJoCo 仿真环境与 Stable-Baselines3 框架的机器乌龟强化学习系统。尝试在不参考真实乌龟爬行方式的前提下，通过强化学习算法探索适合机器乌龟的爬行姿态。</p>
+                        <p lang="en">A reinforcement learning system for robotic turtles based on the MuJoCo simulation environment and the Stable-Baselines3 framework. This system attempts to discover optimal crawling postures for robotic turtles through reinforcement learning algorithms, without relying on any reference data from real turtle movements.</p>
+                    </div>
+                    <a href="https://github.com/Sam-Fic/turtle-rl-locomotion" target="_blank" class="project-link">
+                        <i class="fab fa-github"></i> <i class="fas fa-code-branch" style="margin-left: 3px; font-size: 0.9em; opacity: 1;"></i> GitHub <span class="arrow"></span>&rarr;
+                    </a>
                 </div>
-                <a href="https://github.com/Sam-Fic/szyszka" target="_blank" class="project-link">
-                    <i class="fab fa-github"></i> <i class="fas fa-code-branch" style="margin-left: 3px; font-size: 0.9em; opacity: 1;"></i> GitHub <span class="arrow"></span>&rarr;
-                </a>
+
+                <!-- 卡片 5 -->
+                <div class="project-card">
+                    <div class="project-image">
+                        <img src="assets/images/uav.png" alt="UAV / 船模综合遥控系统" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div>
+                        <h3 lang="zh">电网无人机上层机构遥控系统</h3>
+                        <h3 lang="en">Power Grid UAV Top-level RC System
+                        </h3>
+                        <p lang="zh">基于 Arduino 的遥控控制系统，实现多执行机构控制（推进电机、推杆、舵机），具备模块化设计、信号抗干扰优化及安全启动机制。</p>
+                        <p lang="en">Arduino-based RC control system for multi-actuator control (propulsion motor, linear actuator, servos), featuring modular design, signal anti-interference optimization, and safe boot mechanism.</p>
+                    </div>
+                    <a href="https://gitee.com/samfic/uav_control" target="_blank" class="project-link">
+                        <i class="fab fa-git-alt"></i> Gitee <span class="arrow"></span>&rarr;
+                    </a>
+                </div>
             </div>
         </div>
     </section>

@@ -401,6 +401,35 @@ section:last-of-type {
     gap: 2rem;
 }
 
+.project-group {
+    margin-bottom: 3.5rem;
+}
+
+.project-group:last-child {
+    margin-bottom: 0;
+}
+
+.project-category-title {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 1.5rem;
+    margin-bottom: 1.8rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 2px solid var(--border);
+    color: var(--text);
+}
+
+.project-category-title i {
+    color: var(--primary);
+}
+
+.project-category-title [lang="en"] {
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
 .project-card {
     background-color: var(--card-bg);
     border: 1px solid var(--border);
