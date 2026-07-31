@@ -37,18 +37,22 @@
     transition: background-color 0.3s, border-color 0.3s, color 0.3s;
 }
 
-/* 全局去除点击后的焦点轮廓框与点击高亮（保留各元素自定义 hover/::before 动画） */
+/* 鼠标点击去框、点击高亮；键盘聚焦（Tab）保留可见轮廓以保证可访问性 */
 a,
 button {
-    outline: none;
     -webkit-tap-highlight-color: transparent;
 }
-a:focus,
+a:focus:not(:focus-visible),
+button:focus:not(:focus-visible),
 a:active,
-button:focus,
 button:active {
     outline: none;
     background: transparent;
+}
+a:focus-visible,
+button:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
 }
 
 html {
@@ -128,13 +132,6 @@ header {
     position: relative;
     text-decoration: none;
     padding-bottom: 6px;
-    outline: none;
-    -webkit-tap-highlight-color: transparent;
-}
-.nav-links a:focus,
-.nav-links a:active {
-    outline: none;
-    background: transparent;
 }
 .nav-links a::after {
     content: '';
@@ -402,9 +399,6 @@ section:last-of-type {
 }
 .btn-contact[data-copied="true"] {
     color: #FFFFFF;
-}
-.btn-contact &rarr {
-    margin-left: 8px;
 }
 
 .about-content {
@@ -699,13 +693,6 @@ footer {
         display: inline-block;
         padding: 0.75rem 0;
         font-size: 1.1rem;
-        outline: none;
-        -webkit-tap-highlight-color: transparent;
-    }
-    .nav-links a:focus,
-    .nav-links a:active {
-        outline: none;
-        background: transparent;
     }
 
     /* 移动端菜单项：与宽屏同款下划线效果（跟随文字宽度，确保可见） */
