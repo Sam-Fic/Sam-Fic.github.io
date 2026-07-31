@@ -114,6 +114,13 @@ header {
     position: relative;
     text-decoration: none;
     padding-bottom: 6px;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+}
+.nav-links a:focus,
+.nav-links a:active {
+    outline: none;
+    background: transparent;
 }
 .nav-links a::after {
     content: '';
@@ -678,6 +685,13 @@ footer {
         display: inline-block;
         padding: 0.75rem 0;
         font-size: 1.1rem;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+    .nav-links a:focus,
+    .nav-links a:active {
+        outline: none;
+        background: transparent;
     }
 
     /* 移动端菜单项：与宽屏同款下划线效果（跟随文字宽度，确保可见） */
