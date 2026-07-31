@@ -680,6 +680,24 @@ footer {
         font-size: 1.1rem;
     }
 
+    /* 移动端菜单项：与宽屏同款下划线效果（跟随文字宽度，确保可见） */
+    .nav-links li {
+        display: flex;
+        justify-content: center;
+    }
+    .nav-links a::after {
+        left: 50%;
+        width: 100%;
+        transform: translateX(-50%);
+        clip-path: inset(0 100% 0 0);
+        z-index: 0;
+    }
+    .nav-links a:hover::after,
+    .nav-links a:focus::after,
+    .nav-links a:active::after {
+        clip-path: inset(0 0 0 0);
+    }
+
     #hero {
         flex-direction: column;
         text-align: center;
