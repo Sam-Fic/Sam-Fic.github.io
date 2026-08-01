@@ -262,6 +262,91 @@ section:last-of-type {
     100% { transform: translateX(100%); }
 }
 
+/* 可点击放大的图片：鼠标悬停提示 */
+.zoomable {
+    cursor: zoom-in;
+}
+
+/* Lightbox 放大预览 */
+.lightbox {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    z-index: 2000;
+    visibility: hidden;
+    cursor: zoom-out;
+}
+.lightbox.open {
+    visibility: visible;
+}
+/* 背景遮罩独立一层，仅此层做透明度渐变，图片本身不受影响 */
+.lightbox::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.85);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 0;
+}
+.lightbox.active::before {
+    opacity: 1;
+}
+.lightbox img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+    transform-origin: center center;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+    position: relative;
+    z-index: 1;
+}
+.lightbox-close {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--primary);
+    border: 2px solid var(--primary);
+    color: #FFFFFF;
+    border-radius: 0 !important;
+    cursor: pointer;
+    font-size: 1.5rem;
+    overflow: hidden;
+    z-index: 1;
+    transition: border-color 0.3s ease, color 0.3s ease;
+}
+.lightbox-close::before {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: calc(100% + 4px);
+    background-color: #fff;
+    transform: translateY(100%);
+    transition: transform 0.4s ease;
+    z-index: -1;
+}
+.lightbox-close:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+.lightbox-close:hover::before {
+    transform: translateY(0);
+}
+
 .avatar-placeholder {
     font-size: 3rem;
     color: var(--border);
