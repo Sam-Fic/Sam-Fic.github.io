@@ -184,6 +184,8 @@ if (progressBar) {
         sourceRect = contentRect(img, img.getBoundingClientRect()); // 取悬停态位移后的位置
         sourceImg = img;
         img.style.visibility = 'hidden'; // 隐藏原位图，由 lightbox 图从原位飞出
+        // 全屏 object-fit 跟随缩略图：cover→cover、contain→contain，避免返回时裁切跳变
+        lightboxImg.style.objectFit = getComputedStyle(img).objectFit || 'contain';
         lightboxImg.src = img.src;
         lightboxImg.alt = img.alt || '';
         document.body.style.overflow = 'hidden';
@@ -236,6 +238,7 @@ if (progressBar) {
             lightbox.classList.remove('open');
             lightboxImg.src = '';
             lightboxImg.style.transform = '';
+            lightboxImg.style.objectFit = '';
             document.body.style.overflow = '';
             if (sourceImg) {
                 sourceImg.style.visibility = '';
