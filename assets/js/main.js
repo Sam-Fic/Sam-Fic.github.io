@@ -124,6 +124,7 @@ if (progressBar) {
     const EASING = 'cubic-bezier(0.22, 1, 0.36, 1)';
     let sourceRect = null;
     let sourceImg = null;
+    let sourceCard = null;
 
     // 根据图片自身的 object-fit，计算其在盒子内实际可见的内容矩形
     // 全屏图固定 contain；缩略图可能是 cover（裁切填满）或 contain（完整居中）
@@ -171,7 +172,16 @@ if (progressBar) {
             sourceImg.style.visibility = '';
             sourceImg = null;
         }
-        sourceRect = contentRect(img, img.getBoundingClientRect());
+        if (sourceCard) {
+            sourceCard.classList.remove('active');
+            sourceCard = null;
+        }
+        const card = img.closest('.project-card, .experience-card');
+        if (card) {
+            card.classList.add('active'); // 让卡片保持悬停态层叠效果
+            sourceCard = card;
+        }
+        sourceRect = contentRect(img, img.getBoundingClientRect()); // 取悬停态位移后的位置
         sourceImg = img;
         img.style.visibility = 'hidden'; // 隐藏原位图，由 lightbox 图从原位飞出
         lightboxImg.src = img.src;
@@ -205,6 +215,14 @@ if (progressBar) {
         if (!sourceRect) {
             lightbox.classList.remove('active', 'open');
             document.body.style.overflow = '';
+            if (sourceImg) {
+                sourceImg.style.visibility = '';
+                sourceImg = null;
+            }
+            if (sourceCard) {
+                sourceCard.classList.remove('active');
+                sourceCard = null;
+            }
             return;
         }
         const t = fitTransform(sourceRect);
@@ -222,6 +240,10 @@ if (progressBar) {
             if (sourceImg) {
                 sourceImg.style.visibility = '';
                 sourceImg = null;
+            }
+            if (sourceCard) {
+                sourceCard.classList.remove('active');
+                sourceCard = null;
             }
             sourceRect = null;
         }, 300);
