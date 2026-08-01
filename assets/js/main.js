@@ -125,6 +125,18 @@ if (progressBar) {
     let sourceRect = null;
     let sourceImg = null;
     let sourceCard = null;
+    let userScale = 1;
+    let userTx = 0, userTy = 0; // 滚轮缩放后拖拽平移的偏移量
+    let baseRect = null; // 打开稳定后的原始全屏内容矩形（未受滚轮缩放影响）
+
+    // 应用全屏态的滚动缩放 + 拖拽平移（在打开稳定后的原始全屏态基础上）
+    function applyUserTransform(transition) {
+        if (transition) {
+            lightboxImg.style.transition = transition;
+        }
+        lightboxImg.style.transform =
+            'translate(' + userTx + 'px, ' + userTy + 'px) scale(' + userScale + ')';
+    }
 
     // 根据图片自身的 object-fit，计算其在盒子内实际可见的内容矩形
     // 全屏图固定 contain；缩略图可能是 cover（裁切填满）或 contain（完整居中）
@@ -157,9 +169,11 @@ if (progressBar) {
     }
 
     // 以“内容矩形”做 FLIP：等比缩放，保证动画中图片不变形
-    function fitTransform(rect) {
-        const finalBox = lightboxImg.getBoundingClientRect();
-        const finalRect = contentRect(lightboxImg, finalBox);
+    // finalRect 默认为实时测量（打开飞入时用）；关闭飞回时传入记录的原始全屏态，排除滚轮缩放干扰
+    function fitTransform(rect, finalRect) {
+        if (!finalRect) {
+            finalRect = contentRect(lightboxImg, lightboxImg.getBoundingClientRect());
+        }
         if (!finalRect.width || !finalRect.height) return null;
         const dx = (rect.left + rect.width / 2) - (finalRect.left + finalRect.width / 2);
         const dy = (rect.top + rect.height / 2) - (finalRect.top + finalRect.height / 2);
@@ -183,6 +197,9 @@ if (progressBar) {
         }
         sourceRect = contentRect(img, img.getBoundingClientRect()); // 取悬停态位移后的位置
         sourceImg = img;
+        userScale = 1; // 重置滚轮缩放
+        userTx = 0;
+        userTy = 0; // 重置拖拽平移
         img.style.visibility = 'hidden'; // 隐藏原位图，由 lightbox 图从原位飞出
         // 全屏 object-fit 跟随缩略图：cover→cover、contain→contain，避免返回时裁切跳变
         lightboxImg.style.objectFit = getComputedStyle(img).objectFit || 'contain';
@@ -193,16 +210,20 @@ if (progressBar) {
         const start = function () {
             lightbox.classList.add('open', 'active');
             const t = fitTransform(sourceRect);
+            baseRect = contentRect(lightboxImg, lightboxImg.getBoundingClientRect()); // 记录原始全屏态
             if (t) {
                 lightboxImg.style.transition = 'none';
                 lightboxImg.style.transform = t;
                 // 强制回流，确保初始 transform 生效
                 lightboxImg.getBoundingClientRect();
-                requestAnimationFrame(function () {
+            }
+            requestAnimationFrame(function () {
+                if (t) {
                     lightboxImg.style.transition = 'transform 0.3s ' + EASING;
                     lightboxImg.style.transform = 'translate(0, 0) scale(1)';
-                });
-            }
+                }
+                lightboxClose.classList.add('show'); // 关闭按钮擦除出现
+            });
         };
 
         if (lightboxImg.complete && lightboxImg.naturalWidth) {
@@ -216,6 +237,7 @@ if (progressBar) {
     function closeLightbox() {
         if (!sourceRect) {
             lightbox.classList.remove('active', 'open');
+            lightboxClose.classList.remove('show');
             document.body.style.overflow = '';
             if (sourceImg) {
                 sourceImg.style.visibility = '';
@@ -225,10 +247,15 @@ if (progressBar) {
                 sourceCard.classList.remove('active');
                 sourceCard = null;
             }
+            userScale = 1;
+            userTx = 0;
+            userTy = 0;
+            baseRect = null;
             return;
         }
-        const t = fitTransform(sourceRect);
+        const t = fitTransform(sourceRect, baseRect); // 以原始全屏态为基准，缩放可平滑回落
         lightbox.classList.remove('active'); // 背景遮罩开始淡出，图片仍清晰飞回
+        lightboxClose.classList.remove('show'); // 关闭按钮擦除消失
         if (t) {
             lightboxImg.style.transition = 'transform 0.3s ' + EASING;
             lightboxImg.style.transform = t;
@@ -239,7 +266,12 @@ if (progressBar) {
             lightboxImg.src = '';
             lightboxImg.style.transform = '';
             lightboxImg.style.objectFit = '';
+            lightboxClose.classList.remove('show');
             document.body.style.overflow = '';
+            userScale = 1;
+            userTx = 0;
+            userTy = 0;
+            baseRect = null;
             if (sourceImg) {
                 sourceImg.style.visibility = '';
                 sourceImg = null;
@@ -267,6 +299,45 @@ if (progressBar) {
         if (e.key === 'Escape' && lightbox.classList.contains('open')) {
             closeLightbox();
         }
+    });
+
+    // 全屏状态下滚轮进一步缩放图片（以中心为基准，范围 0.5x~6x）
+    lightbox.addEventListener('wheel', function (e) {
+        if (!lightbox.classList.contains('open')) return;
+        e.preventDefault();
+        const factor = e.deltaY < 0 ? 1.12 : 1 / 1.12;
+        userScale = Math.min(6, Math.max(0.5, userScale * factor));
+        applyUserTransform('transform 0.12s ease-out');
+    }, { passive: false });
+
+    // 滚轮缩放后允许鼠标拖拽平移（缩放 > 1 时才可平移）
+    let dragging = false;
+    let dragStartX = 0, dragStartY = 0;
+    let dragOrigTx = 0, dragOrigTy = 0;
+
+    lightboxImg.addEventListener('mousedown', function (e) {
+        if (userScale <= 1) return; // 未放大不触发拖拽
+        dragging = true;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        dragOrigTx = userTx;
+        dragOrigTy = userTy;
+        lightboxImg.style.transition = 'none';
+        lightbox.style.cursor = 'grabbing';
+        e.preventDefault();
+    });
+
+    window.addEventListener('mousemove', function (e) {
+        if (!dragging) return;
+        userTx = dragOrigTx + (e.clientX - dragStartX);
+        userTy = dragOrigTy + (e.clientY - dragStartY);
+        applyUserTransform('none');
+    });
+
+    window.addEventListener('mouseup', function () {
+        if (!dragging) return;
+        dragging = false;
+        lightbox.style.cursor = 'zoom-out';
     });
 })();
 
