@@ -35,7 +35,11 @@ function updateFavicon() {
     favicon.href = 'assets/images/avatar.png';
 }
 
-if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+const STORAGE_KEY = 'theme';
+const storedTheme = localStorage.getItem(STORAGE_KEY);
+const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+if (storedTheme === 'dark' || (storedTheme === null && prefersDark)) {
     document.documentElement.setAttribute('data-theme', 'dark');
     themeIcon.textContent = 'dark_mode';
 }
@@ -46,9 +50,11 @@ themeToggle.addEventListener('click', () => {
     if (currentTheme === 'dark') {
         document.documentElement.removeAttribute('data-theme');
         themeIcon.textContent = 'wb_sunny';
+        localStorage.setItem(STORAGE_KEY, 'light');
     } else {
         document.documentElement.setAttribute('data-theme', 'dark');
         themeIcon.textContent = 'dark_mode';
+        localStorage.setItem(STORAGE_KEY, 'dark');
     }
     updateFavicon();
 });

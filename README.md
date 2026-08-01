@@ -58,6 +58,8 @@ my_homepage/
     ├── css/
     │   └── style.css   # 样式表
     ├── fonts/
-    │   └── MiSans-Demibold.ttf
-    └── images/         # 项目图片与素材
+    │   └── MiSans-Demibold.ttf   # 站内自托管中文字体
+    ├── images/         # 头像、项目与经历配图、技术栈 logo
+    └── js/
+        └── main.js     # 交互逻辑（语言/主题切换、菜单、复制、返回顶部等）
 ```
