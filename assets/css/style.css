@@ -583,6 +583,31 @@ section:last-of-type {
     font-size: 1.2rem;
     margin-bottom: 1.5rem;
     overflow: hidden;
+    cursor: zoom-in;
+}
+
+/* 鼠标悬停可缩放图片方块时，居中显示“全屏”图标遮罩 */
+.project-image::after,
+.exp-image::after {
+    content: "\e5d0"; /* Material Icons: fullscreen */
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Material Icons';
+    font-feature-settings: 'liga';
+    font-size: 2.5rem;
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.45);
+    opacity: 0;
+    transition: opacity 0.2s ease-out;
+    z-index: 2;
+    pointer-events: none;
+}
+.project-image:hover::after,
+.exp-image:hover::after {
+    opacity: 1;
 }
 
 .project-image img {
@@ -686,6 +711,7 @@ section:last-of-type {
     color: var(--text-secondary);
     font-size: 1.5rem;
     overflow: hidden;
+    cursor: zoom-in;
 }
 
 .exp-info {
