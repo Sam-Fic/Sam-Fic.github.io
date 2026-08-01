@@ -339,6 +339,68 @@ if (progressBar) {
         dragging = false;
         lightbox.style.cursor = 'zoom-out';
     });
+
+    // 移动端触摸支持：双指捏合缩放 + 单指拖拽平移 + 轻点关闭
+    let touchMode = false;          // 本次触摸是否为双指捏合
+    let pinchStartDist = 0;
+    let pinchStartScale = 1;
+    let touchStartX = 0, touchStartY = 0;
+    let touchOrigTx = 0, touchOrigTy = 0;
+    let touchMoved = false;         // 单指是否发生移动（用于区分轻点与拖拽）
+
+    function touchDist(t) {
+        const dx = t[0].clientX - t[1].clientX;
+        const dy = t[0].clientY - t[1].clientY;
+        return Math.hypot(dx, dy);
+    }
+
+    lightboxImg.addEventListener('touchstart', function (e) {
+        if (!lightbox.classList.contains('open')) return;
+        if (e.touches.length === 2) {
+            touchMode = true;
+            touchMoved = true; // 双指不视为轻点
+            pinchStartDist = touchDist(e.touches);
+            pinchStartScale = userScale;
+            lightboxImg.style.transition = 'none';
+            e.preventDefault();
+        } else if (e.touches.length === 1) {
+            touchMode = false;
+            touchMoved = false;
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            touchOrigTx = userTx;
+            touchOrigTy = userTy;
+            lightboxImg.style.transition = 'none';
+        }
+    }, { passive: false });
+
+    lightboxImg.addEventListener('touchmove', function (e) {
+        if (!lightbox.classList.contains('open')) return;
+        e.preventDefault();
+        if (e.touches.length === 2 && touchMode) {
+            const dist = touchDist(e.touches);
+            if (pinchStartDist > 0) {
+                userScale = Math.min(6, Math.max(0.5, pinchStartScale * dist / pinchStartDist));
+                applyUserTransform('none');
+            }
+        } else if (e.touches.length === 1 && !touchMode && userScale > 1) {
+            const dx = e.touches[0].clientX - touchStartX;
+            const dy = e.touches[0].clientY - touchStartY;
+            if (Math.abs(dx) > 4 || Math.abs(dy) > 4) touchMoved = true;
+            userTx = touchOrigTx + dx;
+            userTy = touchOrigTy + dy;
+            applyUserTransform('none');
+        }
+    }, { passive: false });
+
+    lightboxImg.addEventListener('touchend', function (e) {
+        if (!lightbox.classList.contains('open')) return;
+        // 单指轻点（未移动、未捏合）且作用在图片上 → 关闭预览
+        if (e.touches.length === 0 && !touchMode && !touchMoved) {
+            closeLightbox();
+        }
+        touchMode = false;
+    }, { passive: false });
 })();
 
 /* 图片加载遮罩：加载完成前持续播放 spinner；加载完成时等当前循环播完再完整擦除收尾 */
