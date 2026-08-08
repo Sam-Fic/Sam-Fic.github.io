@@ -213,11 +213,23 @@ section:last-of-type {
 
 .section-title {
     font-size: 2rem;
-    margin-bottom: 3rem;
+    margin-bottom: 2.5rem;
     position: relative;
     padding-left: 1rem;
     border-left: 4px solid var(--primary);
     letter-spacing: 1px;
+}
+
+.section-note {
+    margin: 0 0 2.5rem;
+    padding-left: 1rem;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+
+.section-note i.fas.fa-code-branch {
+    color: var(--primary);
 }
 
 #hero {
