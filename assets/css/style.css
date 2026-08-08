@@ -205,10 +205,6 @@ section {
     padding: 6rem 2rem 4rem 2rem;
     max-width: 1200px;
     margin: 0 auto;
-    border-bottom: 1px solid var(--border);
-}
-section:last-of-type {
-    border-bottom: none;
 }
 
 .section-title {
