@@ -520,7 +520,7 @@ if (backToTopBtn) {
 (function () {
     const targets = document.querySelectorAll(
         '.section-title, .section-note, .project-category-title, .project-card, ' +
-        '.experience-card, .stack-category, .about-content'
+        '.experience-card, .stack-category, .about-content, .spotify-embed'
     );
     if (!targets.length) return;
 
@@ -662,4 +662,190 @@ if (backToTopBtn) {
             raf = requestAnimationFrame(frame);
         }
     });
+})();
+
+/* ===== Footer 几何脉冲矩阵（鼠标联动） =====
+   平静态：画布完全空白，footer 与普通页面无异。
+   鼠标进入后：以光标所在格为中心亮起一圈圈实心方块组成的同心方环，
+   按 9Hz 整数节拍硬切换亮/灭；光标压过的格子留下短促的实心轨迹。
+   网格整体居中，边缘不会出现被裁切的半截方块。全程只有实心 #FF6600 的亮/灭两态，
+   没有透明度渐变、没有缓动、没有曲线——一切硬切。 */
+(function () {
+    if (prefersReducedMotion()) return;
+    const footer = document.querySelector('footer');
+    const canvas = document.getElementById('footerFx');
+    if (!footer || !canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const CELL = 20;   // 网格步长（px）
+    const INSET = 4;   // 方块相对格子的内缩，形成正交缝隙
+    const FLICK = 9;   // 闪烁节拍（Hz），状态整帧硬切换
+    const R = 8;       // 影响半径（格），切比雪夫距离 → 同心方环
+    // 离散透明度台阶（posterize）：档位硬跳，不做丝滑渐变
+    const LEVELS = [0.20, 0.42, 0.65, 0.85];
+
+    let w = 0, h = 0, dpr = 1, cols = 0, rows = 0;
+    let offX = 0, offY = 0;   // 网格整体居中偏移，保证边缘不被裁切
+    let cx = -1, cy = -1;      // 光标所在网格坐标
+    let px = -100, py = -100;  // 光标像素坐标（画十字线用）
+    let inside = false;
+    let inView = false, running = false, raf = 0, last = 0, t = 0;
+    const trail = new Map();   // "i,j" -> 到期时间戳，到点瞬间熄灭
+
+    // 确定性整数散列：同一格在同一节拍内状态稳定，节拍推进即硬切换
+    function hash(x, y, k) {
+        let n = (x * 374761393 + y * 668265263 + k * 1274126177) | 0;
+        n = Math.imul(n ^ (n >>> 13), 1103515245);
+        n = n ^ (n >>> 16);
+        return (n >>> 0) / 4294967295;
+    }
+
+    function build() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        w = footer.clientWidth;
+        h = footer.clientHeight;
+        canvas.width = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+        canvas.style.width = w + 'px';
+        canvas.style.height = h + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        // 只取完整的格子数，并把整张网格居中 → 边缘不会出现被裁切的半截方块
+        cols = Math.max(1, Math.floor(w / CELL));
+        rows = Math.max(1, Math.floor(h / CELL));
+        offX = (w - cols * CELL) / 2;
+        offY = (h - rows * CELL) / 2;
+        trail.clear();
+    }
+
+    function cellRect(i, j) {
+        ctx.fillRect(offX + i * CELL + INSET, offY + j * CELL + INSET, CELL - INSET * 2, CELL - INSET * 2);
+    }
+
+    function frame(now) {
+        if (!running) return;
+        raf = requestAnimationFrame(frame);
+        if (!last) last = now;
+        let dt = (now - last) / 1000;
+        last = now;
+        if (dt > 0.05) dt = 0.05; // 卡顿 / 切回标签页时兜底
+        t += dt;
+
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = '#FF6600';
+
+        // 1) 同心方环：各环“被点亮”的概率按切比雪夫距离阶梯下降；
+        //    点亮的格子再按离散台阶取透明度（档位硬跳，非丝滑渐变）
+        if (inside && cx >= 0) {
+            const k = Math.floor(t * FLICK);
+            for (let dj = -R; dj <= R; dj++) {
+                const j = cy + dj;
+                if (j < 0 || j >= rows) continue;
+                for (let di = -R; di <= R; di++) {
+                    const i = cx + di;
+                    if (i < 0 || i >= cols) continue;
+                    const d = Math.max(Math.abs(di), Math.abs(dj));
+                    const thr = d <= 2 ? 0.95 : d <= 4 ? 0.60 : d <= 6 ? 0.32 : 0.12;
+                    const v = hash(i, j, k);
+                    if (v < thr) {
+                        const lv = LEVELS[Math.floor(hash(i, j, k + 1) * LEVELS.length)];
+                        ctx.fillStyle = 'rgba(255, 102, 0, ' + lv + ')';
+                        cellRect(i, j);
+                    }
+                }
+            }
+        }
+
+        // 2) 移动轨迹：光标压过的格子亮起（实心满不透明），随机时长后瞬间熄灭（不渐隐）
+        ctx.fillStyle = '#FF6600';
+        for (const [key, expire] of trail) {
+            if (now >= expire) { trail.delete(key); continue; }
+            const sep = key.indexOf(',');
+            cellRect(+key.slice(0, sep), +key.slice(sep + 1));
+        }
+    }
+
+    function start() {
+        if (running) return;
+        running = true;
+        last = 0;
+        raf = requestAnimationFrame(frame);
+    }
+    function stop() {
+        running = false;
+        cancelAnimationFrame(raf);
+    }
+
+    footer.addEventListener('mousemove', function (e) {
+        const rect = footer.getBoundingClientRect();
+        px = e.clientX - rect.left;
+        py = e.clientY - rect.top;
+        cx = Math.floor((px - offX) / CELL);
+        cy = Math.floor((py - offY) / CELL);
+        inside = true;
+        footer.classList.add('hot'); // 版权文字与上边框硬切换为主色
+
+        // 轨迹格子：只记录光标当前格，250~700ms 后瞬间熄灭
+        const key = cx + ',' + cy;
+        if (!trail.has(key)) {
+            trail.set(key, performance.now() + 250 + Math.random() * 450);
+        }
+    });
+    footer.addEventListener('mouseleave', function () {
+        inside = false;
+        footer.classList.remove('hot');
+    });
+
+    window.addEventListener('resize', build);
+
+    // 只在 footer 进入视口时渲染
+    if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                inView = entry.isIntersecting;
+                if (inView) start();
+                else stop();
+            });
+        }, { threshold: 0 });
+        io.observe(footer);
+    } else {
+        inView = true;
+        start();
+    }
+
+    // 标签页隐藏时暂停，恢复后仅在 footer 可见时继续
+    document.addEventListener('visibilitychange', function () {
+        if (document.hidden) {
+            stop();
+        } else if (inView) {
+            start();
+        }
+    });
+
+    build();
+})();
+
+/* ===== Spotify 播放器：主题跟随站点明暗 =====
+   Embed 自身不自动适配页面主题，故按当前主题改写 iframe 的 theme 参数。
+   注意：改写 src 会重载播放器，因此切主题时正在播放的音乐会重新开始。 */
+(function () {
+    const player = document.getElementById('spotifyPlayer');
+    if (!player) return;
+
+    // 歌单 ID 与基础地址（换歌单只需改这一处）
+    const EMBED_BASE = 'https://open.spotify.com/embed/playlist/7EMV7PM2opruGcHFrrNWtf?utm_source=generator';
+
+    function applySpotifyTheme() {
+        // 亮色模式追加 theme=0（白底）；暗色用默认（黑底），故不追加参数
+        player.src = isDark() ? EMBED_BASE : EMBED_BASE + '&theme=0';
+    }
+
+    applySpotifyTheme();
+
+    if (themeToggle) {
+        // 主题切换在擦除动画 50% 处（约 210ms）真正生效，这里稍后同步
+        themeToggle.addEventListener('click', function () {
+            setTimeout(applySpotifyTheme, 230);
+        });
+    }
 })();

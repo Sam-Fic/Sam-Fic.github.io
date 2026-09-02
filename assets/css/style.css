@@ -539,10 +539,69 @@ section {
 
 .about-content {
     font-size: 1.15rem;
-    max-width: 800px;
+    max-width: 560px;
+}
+/* 关于我：左侧简介 + 右侧 Spotify 播放器的两栏布局，窄屏自动堆叠 */
+.about-layout {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 2.5rem;
+}
+.about-aside {
+    flex: 1 1 300px;
+    max-width: 420px;
 }
 .about-content p {
     margin-bottom: 1.5rem;
+}
+
+/* 音乐：Spotify 播放器外层卡片
+   复用项目卡片的“底板 + 硬阴影”双伪层结构，保持全站纯直角视觉统一 */
+.spotify-embed {
+    position: relative;
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: transparent;
+    border: none;
+    padding: 1.25rem;
+    transition: transform 0.2s var(--ease);
+}
+.spotify-embed::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: var(--card-bg);
+    box-shadow: inset 0 0 0 3px var(--border);
+    pointer-events: none;
+    z-index: -1;
+}
+.spotify-embed::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: var(--primary);
+    opacity: 0;
+    transform: translate(0, 0);
+    transition: transform 0.2s var(--ease), opacity 0.2s var(--ease);
+    pointer-events: none;
+    z-index: -2;
+}
+.spotify-embed:hover {
+    transform: translate(-4px, -4px);
+}
+.spotify-embed:hover::before {
+    box-shadow: inset 0 0 0 3px var(--primary);
+}
+.spotify-embed:hover::after {
+    transform: translate(6px, 6px);
+    opacity: 1;
+}
+.spotify-embed iframe {
+    display: block;
+    width: 100%;
+    border: 0;
 }
 
 .project-grid {
@@ -860,6 +919,28 @@ footer {
     background-color: var(--bg); /* 实底盖住底层粒子画布，粒子不进入 footer */
     position: relative;
     z-index: 1;
+    overflow: hidden; /* 裁切均衡器画布 / 火花溢出 */
+}
+
+/* Footer 几何脉冲矩阵：JS 驱动画布，平时完全空白，鼠标进入后硬切点亮 */
+#footerFx {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+}
+footer p {
+    position: relative;
+    z-index: 1;
+    display: inline-block;
+    background-color: var(--bg); /* 常驻地板块，盖住其下方的橙色小方块 */
+    padding: 0.6em; /* 相对文字字号，四周等距留白 */
+    line-height: 1; /* 收住行高，使上下留白与左右视觉一致 */
+}
+/* 悬停态不改动任何颜色，仅作为 JS 标记（驱动画布动效）使用 */
+footer.hot {
 }
 
 .hamburger {
@@ -1090,8 +1171,9 @@ footer {
     .theme-wipe {
         display: none;
     }
-    /* 减少动态时关闭新增动效：背景粒子画布隐藏 */
-    #bgParticles {
+    /* 减少动态时关闭新增动效：背景粒子画布、footer 几何矩阵画布隐藏 */
+    #bgParticles,
+    #footerFx {
         display: none;
     }
 }

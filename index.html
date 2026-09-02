@@ -581,20 +581,39 @@
         </div>
     </section>
 
-    <!-- 关于我 Section -->
+    <!-- 关于我 Section（右侧内嵌 Spotify 歌单播放器） -->
     <section id="about">
         <h2 class="section-title">
             <span data-lang="zh">关于我</span>
             <span data-lang="en">About Me</span>
         </h2>
-        <div class="about-content">
-            <p data-lang="zh">你好！这里是 Sam-Fic。我喜欢绘画和音乐。<strong>重型贝斯（最喜欢的音乐人是 Virtual Riot） / 金属核（最喜欢的乐队是 Wind Walkers）音乐重度爱好者</strong>，喜欢<strong>虚拟歌手</strong>技术与文化（头像是嫣汐:D），喜欢学习语言。虽然我是工科出身，但我的梦想是做 UI/UX 设计师。</p>
-            <p data-lang="en">Hi! Sam-Fic here. I'm into drawing and music. A huge fan of <strong>Drum & Bass (favorite artist is Virtual Riot)</strong> and <strong>metalcore (favorite band is Wind Walkers)</strong>, really passionate about <strong>Vocaloid</strong> technology and culture (my avatar is Yanxi :D), and love learning languages. Even though I studied engineering, my dream is to be a UI/UX designer.</p>
+        <div class="about-layout">
+            <div class="about-content">
+                <p data-lang="zh">你好！这里是 Sam-Fic。我喜欢绘画和音乐。<strong>重型贝斯（最喜欢的音乐人是 Virtual Riot） / 金属核（最喜欢的乐队是 Wind Walkers）音乐重度爱好者</strong>，喜欢<strong>虚拟歌手</strong>技术与文化（头像是嫣汐:D），喜欢学习语言。虽然我是工科出身，但我的梦想是做 UI/UX 设计师。</p>
+                <p data-lang="en">Hi! Sam-Fic here. I'm into drawing and music. A huge fan of <strong>Drum & Bass (favorite artist is Virtual Riot)</strong> and <strong>metalcore (favorite band is Wind Walkers)</strong>, really passionate about <strong>Vocaloid</strong> technology and culture (my avatar is Yanxi :D), and love learning languages. Even though I studied engineering, my dream is to be a UI/UX designer.</p>
+            </div>
+            <div class="about-aside">
+                <!-- 把下面 iframe 的 playlist/ 之后那段 ID 换成你自己的歌单 ID
+                     （打开歌单页，URL 形如 open.spotify.com/playlist/XXXXXXXX，取 XXXXXXXX） -->
+                <div class="spotify-embed reveal">
+                    <iframe
+                        id="spotifyPlayer"
+                        title="Sam-Fic 的 Spotify 歌单"
+                        width="100%" height="352"
+                        frameborder="0"
+                        loading="lazy"
+                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                        src="https://open.spotify.com/embed/playlist/7EMV7PM2opruGcHFrrNWtf?utm_source=generator">
+                    </iframe>
+                </div>
+            </div>
         </div>
     </section>
 
     <!-- 页脚 -->
     <footer>
+        <!-- 重低音均衡器画布：平时几乎不可见，鼠标进入后被“点亮” -->
+        <canvas id="footerFx" aria-hidden="true"></canvas>
         <p>
             <span>&copy; 2026 Sam-Fic. Powered by heavy bass.</span>
         </p>
