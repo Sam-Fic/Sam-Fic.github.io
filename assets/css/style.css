@@ -575,25 +575,68 @@ section {
 
 .project-card {
     position: relative;
-    background-color: var(--card-bg);
+    /* 底板（背景+边框）与硬阴影分别由 ::before / ::after 绘制，元素自身背景透明：
+       悬停的 transform 会创建层叠上下文，若背景留在元素自身，
+       负 z-index 的阴影伪层会反过来盖在背景上；下沉后层序在任何状态下都稳定 */
+    background-color: transparent;
     border: none;
-    /* 用 inset box-shadow 画 3px 边框，与下方 6px 硬阴影同属 box-shadow 系统、同层对齐，
-       从根本上消除“边框与阴影之间”的亚像素白线 */
-    box-shadow: inset 0 0 0 3px var(--border);
     padding: 2rem;
     display: flex;
     flex-direction: column;
-    transition: box-shadow 0.2s var(--ease), transform 0.2s var(--ease);
+    transition: transform 0.2s var(--ease);
+}
+
+/* 底板层（z:-1）：背景色 + inset 3px 边框，悬停时边框染成主色 */
+.project-card::before,
+.experience-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: var(--card-bg);
+    box-shadow: inset 0 0 0 3px var(--border);
+    transition: box-shadow 0.2s var(--ease);
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* 硬阴影层（z:-2）：整块主色矩形垫在底板之下，悬停时向右下平移 6px。
+   关键点：outer box-shadow 会被浏览器贴着元素边缘裁切，边框环与阴影块
+   是两条独立的渲染边，非整数 DPR / 缩放下各自亚像素取整会露出白缝；
+   改为连续矩形后阴影完整延伸到底板下方，交界处没有裁切边，
+   取整差异只会发生在“底板边缘×橙色”或“橙色×页面背景”，白缝在几何上不可能出现 */
+.project-card::after,
+.experience-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: var(--primary);
+    opacity: 0;
+    transform: translate(0, 0);
+    transition: transform 0.2s var(--ease), opacity 0.2s var(--ease);
+    pointer-events: none;
+    z-index: -2;
 }
 
 .project-card:hover,
 .project-card.active,
 .experience-card:hover,
 .experience-card.active {
-    /* 第一层 inset 把边框染成橙色，第二层是向右下偏移的硬阴影，二者同一渲染域无白线缝 */
-    box-shadow: inset 0 0 0 3px var(--primary),
-                6px 6px 0 var(--primary);
     transform: translate(-4px, -4px);
+}
+
+.project-card:hover::before,
+.project-card.active::before,
+.experience-card:hover::before,
+.experience-card.active::before {
+    box-shadow: inset 0 0 0 3px var(--primary);
+}
+
+.project-card:hover::after,
+.project-card.active::after,
+.experience-card:hover::after,
+.experience-card.active::after {
+    transform: translate(6px, 6px);
+    opacity: 1;
 }
 
 .project-card h3,
@@ -716,11 +759,10 @@ section {
 .experience-card {
     position: relative;
     display: flex;
-    background-color: var(--card-bg);
+    background-color: transparent;
     border: none;
-    box-shadow: inset 0 0 0 3px var(--border);
     padding: 0.75rem;
-    transition: box-shadow 0.2s var(--ease), transform 0.2s var(--ease);
+    transition: transform 0.2s var(--ease);
 }
 
 .exp-image {
