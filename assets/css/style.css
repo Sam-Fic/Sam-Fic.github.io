@@ -4,10 +4,13 @@
     --text: #1A1A1A;
     --text-secondary: #666666;
     --card-bg: #F9F9F9;
-    --border: #E5E5E5;
+    --border: #E5E5E5;          /* 装饰性分隔线 */
+    --border-strong: #8C8C8C;   /* 控件边框：保证足够的可见性 */
+    --media-bg: #F1F1F1;        /* 图片容器底色 */
     --nav-bg: #FFFFFF;
     --top-btn-border: var(--primary);
     --top-btn-color: #FFFFFF;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @font-face {
@@ -24,6 +27,8 @@
     --text-secondary: #A0A0A0;
     --card-bg: #1A1A1A;
     --border: #2C2C2C;
+    --border-strong: #7A7A7A;
+    --media-bg: #131313;
     --nav-bg: #0F0F0F;
     --top-btn-border: #FFFFFF;
     --top-btn-color: #FFFFFF;
@@ -34,7 +39,34 @@
     padding: 0;
     box-sizing: border-box;
     border-radius: 0 !important;
-    transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+}
+
+/* 说明：这里刻意不放全局 transition。主题切换由 .theme-wipe 的擦除动画完全遮住，
+   若再给全站元素加常驻过渡，切换时会退化成“逐个元素渐变”的波浪效果。 */
+
+/* 内联 SVG 图标（替代原先外链的 Material Icons / Font Awesome） */
+.svg-sprite {
+    display: none;
+}
+.icon {
+    /* 内联 <svg> 默认 display:inline，此时 CSS width/height 不生效，
+       会导致图标以默认尺寸撑爆行内文本，必须显式 inline-block */
+    display: inline-block;
+    width: 1.15em;
+    height: 1.15em;
+    flex: 0 0 auto;
+    fill: currentColor;
+    vertical-align: -0.16em;
+}
+.icon-fork {
+    width: 0.95em;
+    height: 0.95em;
+    margin-left: 3px;
+}
+.icon-lead {
+    width: 1.25em;
+    height: 1.25em;
+    color: var(--primary);
 }
 
 /* 鼠标点击去框、点击高亮；键盘聚焦（Tab）保留可见轮廓以保证可访问性 */
@@ -51,7 +83,7 @@ button:active {
 }
 a:focus-visible,
 button:focus-visible {
-    outline: 2px solid var(--primary);
+    outline: 3px solid var(--primary);
     outline-offset: 2px;
 }
 
@@ -74,10 +106,11 @@ a:hover {
     text-decoration: underline;
 }
 
-[lang="en"] { display: none; }
-html[data-lang="en"] [lang="zh"] { display: none; }
-html[data-lang="en"] [lang="en"] { display: block; }
-html[data-lang="en"] span[lang="en"], html[data-lang="en"] a[lang="en"] { display: inline; }
+/* 注意：html 元素自身会携带 data-lang 属性用于全局切换，
+   显隐规则必须 :not(html) 排除根元素，否则根元素 display:none 会隐藏整个文档 */
+[data-lang="en"]:not(html) { display: none; }
+html[data-lang="en"] [data-lang="zh"] { display: none; }
+html[data-lang="en"] [data-lang="en"] { display: revert; }
 
 header {
     position: fixed;
@@ -85,7 +118,7 @@ header {
     left: 0;
     width: 100%;
     background-color: var(--nav-bg);
-    border-bottom: 2px solid var(--border);
+    border-bottom: 3px solid var(--border);
     z-index: 1000;
 }
 
@@ -93,10 +126,12 @@ header {
     position: absolute;
     top: 0;
     left: 0;
-    width: 0%;
+    width: 100%;
     height: 4px;
     background-color: var(--primary);
-    transition: width 0.1s ease-out;
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    will-change: transform;
     z-index: 1001;
 }
 
@@ -130,8 +165,17 @@ header {
     color: var(--text);
     font-weight: 500;
     position: relative;
+    isolation: isolate; /* 隔离层叠上下文，保证下划线的负层级不会被祖先背景吞掉 */
     text-decoration: none;
     padding-bottom: 6px;
+}
+
+/* 当前所在章节：下划线常驻 */
+.nav-links a.active::after {
+    clip-path: inset(0 0 0 0);
+}
+.nav-links a.active {
+    color: var(--primary);
 }
 .nav-links a::after {
     content: '';
@@ -156,7 +200,7 @@ header {
 
 .btn-control {
     background: transparent;
-    border: 2px solid var(--border);
+    border: 3px solid var(--border);
     color: var(--text);
     padding: 0.4rem 0.8rem;
     cursor: pointer;
@@ -169,6 +213,7 @@ header {
     justify-content: center;
     min-width: 4rem;
     height: 2.2rem;
+    transition: color 0.4s ease, border-color 0.4s ease;
 }
 
 .btn-control::before {
@@ -197,8 +242,9 @@ header {
     font-family: 'MiSans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-.btn-control .material-icons {
-    font-size: 1.1rem;
+.btn-control .icon {
+    width: 1.25em;
+    height: 1.25em;
 }
 
 section {
@@ -222,10 +268,6 @@ section {
     font-size: 0.9rem;
     line-height: 1.6;
     color: var(--text-secondary);
-}
-
-.section-note i.fas.fa-code-branch {
-    color: var(--primary);
 }
 
 #hero {
@@ -325,7 +367,7 @@ section {
     align-items: center;
     justify-content: center;
     background-color: var(--primary);
-    border: 2px solid var(--top-btn-border);
+    border: 3px solid var(--top-btn-border);
     color: var(--top-btn-color);
     border-radius: 0 !important;
     cursor: pointer;
@@ -358,19 +400,7 @@ section {
     transform: translateY(0);
 }
 
-/* 放大预览期间，让对应卡片保持悬停态的层叠效果 */
-.project-card.active,
-.experience-card.active {
-    border-color: var(--primary);
-    box-shadow: 6px 6px 0px var(--primary);
-    transform: translate(-4px, -4px);
-}
-
-.avatar-placeholder {
-    font-size: 3rem;
-    color: var(--border);
-    font-weight: bold;
-}
+/* 放大预览期间让卡片保持悬停态；阴影与位移统一由 .project-card:hover / .active 规则处理 */
 
 .hero-info h1 {
     font-size: 3.5rem;
@@ -394,10 +424,11 @@ section {
 }
 
 .btn-contact {
+    --lift: 0px; /* 悬停抬升量，复制成功的脉冲动画需要沿用 */
     display: inline-flex;
     align-items: center;
     padding: 0.75rem 1.5rem;
-    border: 2px solid var(--text);
+    border: 3px solid var(--text);
     color: var(--text);
     font-weight: 600;
     position: relative;
@@ -424,14 +455,15 @@ section {
 
 .btn-contact:hover {
     color: #FFFFFF;
-    transform: translateY(-3px);
+    --lift: -3px;
+    transform: translateY(var(--lift));
     text-decoration: none;
 }
 
-.btn-contact i {
+.btn-contact .icon {
     margin-right: 8px;
 }
-.btn-text-wrap i {
+.btn-text-wrap .icon {
     transition: opacity 0.3s ease;
 }
 .btn-text-wrap {
@@ -448,6 +480,7 @@ section {
     opacity: 1;
     visibility: visible;
 }
+/* hover / copied 文案覆盖在原文案上方；中英切换由 [data-lang] 的 display 规则统一处理 */
 .btn-text-hover,
 .btn-text-copied {
     opacity: 0;
@@ -456,26 +489,6 @@ section {
     top: 50%;
     transform: translate(-50%, -50%);
     visibility: hidden;
-}
-.btn-text-normal[lang="en"],
-.btn-text-hover[lang="zh"],
-.btn-text-hover[lang="en"],
-.btn-text-copied[lang="zh"],
-.btn-text-copied[lang="en"] {
-    visibility: hidden;
-}
-[data-lang="en"] .btn-text-normal[lang="zh"],
-[data-lang="en"] .btn-text-hover[lang="zh"],
-[data-lang="en"] .btn-text-copied[lang="zh"] {
-    visibility: hidden;
-}
-[data-lang="en"] .btn-text-normal[lang="en"],
-[data-lang="en"] .btn-text-hover[lang="en"],
-[data-lang="en"] .btn-text-copied[lang="en"] {
-    visibility: hidden;
-}
-[data-lang="en"] .btn-text-normal[lang="en"] {
-    visibility: visible;
 }
 
 /* Hover state */
@@ -486,7 +499,7 @@ section {
     opacity: 1;
     visibility: visible;
 }
-.btn-email:hover i {
+.btn-email:hover .icon {
     opacity: 0;
 }
 
@@ -502,7 +515,7 @@ section {
     opacity: 0;
     visibility: hidden;
 }
-.btn-email[data-copied="true"] i {
+.btn-email[data-copied="true"] .icon {
     opacity: 0;
 }
 .btn-contact[data-copied="true"]::before {
@@ -510,6 +523,14 @@ section {
 }
 .btn-contact[data-copied="true"] {
     color: #FFFFFF;
+    animation: copiedPulse 0.42s var(--ease);
+}
+
+/* 复制成功的即时反馈：一次轻微脉冲 */
+@keyframes copiedPulse {
+    0%   { transform: translateY(var(--lift)) scale(1); }
+    40%  { transform: translateY(var(--lift)) scale(1.045); }
+    100% { transform: translateY(var(--lift)) scale(1); }
 }
 
 .about-content {
@@ -543,31 +564,40 @@ section {
     color: var(--text);
 }
 
-.project-category-title i {
+.project-category-title .icon {
     color: var(--primary);
 }
 
-.project-category-title [lang="en"] {
+.project-category-title [data-lang="en"] {
     font-size: 1.3rem;
     font-weight: 500;
-    color: var(--text-secondary);
 }
 
 .project-card {
+    position: relative;
     background-color: var(--card-bg);
-    border: 1px solid var(--border);
+    border: none;
+    /* 用 inset box-shadow 画 3px 边框，与下方 6px 硬阴影同属 box-shadow 系统、同层对齐，
+       从根本上消除“边框与阴影之间”的亚像素白线 */
+    box-shadow: inset 0 0 0 3px var(--border);
     padding: 2rem;
     display: flex;
     flex-direction: column;
-    transition: all 0.2s ease-out;
+    transition: box-shadow 0.2s var(--ease), transform 0.2s var(--ease);
 }
-.project-card:hover {
-    border-color: var(--primary);
-    box-shadow: 6px 6px 0px var(--primary);
+
+.project-card:hover,
+.project-card.active,
+.experience-card:hover,
+.experience-card.active {
+    /* 第一层 inset 把边框染成橙色，第二层是向右下偏移的硬阴影，二者同一渲染域无白线缝 */
+    box-shadow: inset 0 0 0 3px var(--primary),
+                6px 6px 0 var(--primary);
     transform: translate(-4px, -4px);
 }
 
-.project-card h3 {
+.project-card h3,
+.project-card h4 {
     font-size: 1.4rem;
     margin-bottom: 1rem;
 }
@@ -583,7 +613,8 @@ section {
     position: relative;
     width: 100%;
     height: 180px;
-    background-color: var(--border);
+    padding: 0.875rem; /* 留白，让 contain 的截图不贴边 */
+    background-color: var(--media-bg);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -594,20 +625,17 @@ section {
     cursor: zoom-in;
 }
 
-/* 鼠标悬停可缩放图片方块时，居中显示“全屏”图标遮罩 */
+/* 悬停时的“全屏”提示：图标为内联 SVG data URI，不依赖任何外部字体 */
 .project-image::after,
 .exp-image::after {
-    content: "\e5d0"; /* Material Icons: fullscreen */
+    content: '';
     position: absolute;
     inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Material Icons';
-    font-feature-settings: 'liga';
-    font-size: 2.5rem;
-    color: #fff;
     background-color: rgba(0, 0, 0, 0.45);
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='%23fff'%3E%3Cpath%20d='M3%203h7v2H5v5H3V3zm18%200v7h-2V5h-5V3h7zM3%2014h2v5h5v2H3v-7zm18%200v7h-7v-2h5v-5h2z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 2.5rem 2.5rem;
     opacity: 0;
     transition: opacity 0.2s ease-out;
     z-index: 2;
@@ -621,7 +649,7 @@ section {
 .project-image img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
 }
 
 .project-links {
@@ -637,15 +665,16 @@ section {
     display: inline-flex;
     align-items: center;
     padding: 0.75rem 1.5rem;
-    border: 2px solid var(--text);
+    border: 3px solid var(--text);
     color: var(--text);
     font-weight: 600;
     position: relative;
     overflow: hidden;
     z-index: 1;
     text-decoration: none;
+    transition: color 0.4s ease, border-color 0.4s ease;
 }
-.project-link i {
+.project-link .icon {
     margin-right: 8px;
 }
 .arrow {
@@ -678,33 +707,20 @@ section {
     padding: 6rem 2rem 4rem 2rem;
 }
 
-.experience-title {
-    font-size: 2rem;
-    margin-bottom: 3rem;
-    position: relative;
-    padding-left: 1rem;
-    border-left: 4px solid var(--primary);
-}
-
 .experience-list {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 2.5rem;
 }
 
 .experience-card {
+    position: relative;
     display: flex;
     background-color: var(--card-bg);
-    border: 1px solid var(--border);
-    overflow: hidden;
+    border: none;
+    box-shadow: inset 0 0 0 3px var(--border);
     padding: 0.75rem;
-    transition: all 0.2s ease-out;
-}
-
-.experience-card:hover {
-    border-color: var(--primary);
-    box-shadow: 6px 6px 0px var(--primary);
-    transform: translate(-4px, -4px);
+    transition: box-shadow 0.2s var(--ease), transform 0.2s var(--ease);
 }
 
 .exp-image {
@@ -712,7 +728,7 @@ section {
     width: 300px;
     height: 200px;
     flex-shrink: 0;
-    background-color: var(--border);
+    background-color: var(--media-bg);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -737,10 +753,13 @@ section {
 }
 
 .exp-time {
+    display: inline-block;
     font-size: 0.9rem;
     color: var(--primary);
     margin-bottom: 1rem;
     font-weight: 700;
+    padding-left: 0.6rem;
+    border-left: 4px solid var(--primary);
 }
 
 .exp-desc {
@@ -756,16 +775,19 @@ section {
 }
 
 .stack-category {
-    border: 1px solid var(--border);
+    border: 3px solid var(--border);
     padding: 1.5rem;
     background-color: var(--card-bg);
 }
 
-.stack-category h3 {
+.stack-title {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
     font-size: 1.1rem;
     color: var(--primary);
     margin-bottom: 1.2rem;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 3px solid var(--border);
     padding-bottom: 0.5rem;
 }
 
@@ -777,7 +799,7 @@ section {
 
 .tag {
     background-color: var(--bg);
-    border: 1px solid var(--border);
+    border: 3px solid var(--border);
     padding: 0.4rem 0.8rem;
     font-size: 0.9rem;
     font-weight: 500;
@@ -788,15 +810,16 @@ footer {
     padding: 4rem 2rem;
     font-size: 0.9rem;
     color: var(--text-secondary);
-    border-top: 1px solid var(--border);
+    border-top: 3px solid var(--border);
 }
 
 .hamburger {
     display: none;
 }
 
-.hamburger .material-icons {
-    font-size: 1.3rem;
+.hamburger .icon {
+    width: 1.35em;
+    height: 1.35em;
 }
 
 @media (max-width: 768px) {
@@ -811,7 +834,7 @@ footer {
         width: 100%;
         flex-direction: column;
         background-color: var(--nav-bg);
-        border-bottom: 2px solid var(--border);
+        border-bottom: 3px solid var(--border);
         padding: 0 1rem;
         gap: 0;
         max-height: 0;
@@ -884,11 +907,10 @@ footer {
     justify-content: center;
     background-color: var(--primary);
     color: var(--top-btn-color);
-    border: 2px solid var(--top-btn-border);
-    border-radius: 50%;
+    border: 3px solid var(--top-btn-border);
     cursor: pointer;
     z-index: 999;
-    overflow: hidden;
+    overflow: hidden; /* 全局 border-radius:0 !important 已强制直角，无需再写圆角 */
 
     opacity: 0;
     visibility: hidden;
@@ -933,5 +955,90 @@ footer {
     #backToTop {
         bottom: 20px;
         right: 20px;
+    }
+}
+
+/* ==========================================================
+   动效
+   ========================================================== */
+
+/* 首屏内容依次上滑浮现（纯 CSS，不必等 JS 就绪） */
+.avatar-container,
+.hero-info > * {
+    animation: heroRise 0.7s var(--ease) backwards;
+}
+.hero-info h1 { animation-delay: 0.10s; }
+.hero-subtitle { animation-delay: 0.22s; }
+.contact-links { animation-delay: 0.34s; }
+
+@keyframes heroRise {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* 滚动入场：由 IntersectionObserver 添加 .in 触发；组内靠 --i 做依次延迟。
+   用 animation 而不是 transition——transition 会占用 transform / transition 通道：
+   既覆盖卡片自身的 hover 位移，又让悬停过渡被拖慢 70~420ms；
+   animation 播完（backwards 不保留 to 态）即把控制权完整交还给元素本身。 */
+.reveal {
+    opacity: 0;
+    pointer-events: none; /* 尚未入场时不可交互，避免悬停到透明卡片上出现阴影 */
+}
+.reveal.in {
+    opacity: 1;
+    pointer-events: auto;
+    animation: revealUp 0.55s var(--ease) backwards;
+    animation-delay: calc(var(--i, 0) * 70ms);
+}
+@keyframes revealUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* 主题切换：用 clip-path 直线向下擦除，整页黑白直接沿直线变化（无纯色块滑过感） */
+.theme-wipe {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    pointer-events: none;
+    background-color: var(--wipe-color, #000);
+    clip-path: inset(0 0 100% 0); /* 初始仅顶部一条，看不见 */
+    will-change: clip-path;
+}
+.theme-wipe.run {
+    animation: themeWipeDown 0.42s linear forwards;
+}
+@keyframes themeWipeDown {
+    0%   { clip-path: inset(0 0 100% 0); }   /* 顶部出现一条 */
+    50%  { clip-path: inset(0 0 0 0); }       /* 直线向下擦满全屏：黑白沿直线完成切换 */
+    100% { clip-path: inset(100% 0 0 0); }    /* 继续向下擦出，露出新主题页面 */
+}
+
+/* 尊重系统的“减少动态效果”偏好 */
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    .avatar-container,
+    .hero-info > * {
+        animation: none !important;
+    }
+    .reveal {
+        opacity: 1;
+        transform: none;
+    }
+    .img-cover {
+        animation: none;
+        opacity: 0;
+    }
+    .theme-wipe {
+        display: none;
     }
 }

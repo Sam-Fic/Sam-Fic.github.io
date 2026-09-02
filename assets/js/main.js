@@ -1,63 +1,106 @@
+/* ===== 语言切换 =====
+   首屏语言由 <head> 里的内联脚本在渲染前应用，这里只负责切换与持久化。
+   各元素的显隐完全交给 CSS 的 [data-lang] 规则，JS 不再逐个去改 display。 */
 const langToggle = document.getElementById('langToggle');
 
-function getPreferredLang() {
-    const userLang = navigator.language.toLowerCase();
-    if (userLang.includes('zh')) return 'zh';
-    return 'en';
+function currentLang() {
+    return document.documentElement.getAttribute('data-lang') === 'en' ? 'en' : 'zh';
 }
 
 function applyLang(lang) {
+    const root = document.documentElement;
     if (lang === 'en') {
-        document.documentElement.setAttribute('data-lang', 'en');
-        langToggle.querySelector('[lang="zh"]').style.display = 'none';
-        langToggle.querySelector('[lang="en"]').style.display = 'inline';
+        root.setAttribute('data-lang', 'en');
     } else {
-        document.documentElement.removeAttribute('data-lang');
-        langToggle.querySelector('[lang="zh"]').style.display = 'inline';
-        langToggle.querySelector('[lang="en"]').style.display = 'none';
+        root.removeAttribute('data-lang');
     }
+    root.setAttribute('lang', lang); // 同步语义语言，读屏与翻译工具依赖它
+    try { localStorage.setItem('lang', lang); } catch (e) {}
+
+    // 切换语言后让所有入场动画（reveal）重新播放一遍，如同网页首屏加载
+    replayReveal();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    applyLang(getPreferredLang());
-});
+function replayReveal() {
+    const reveals = document.querySelectorAll('.reveal');
+    if (!reveals.length) return;
+    reveals.forEach(function (el) { el.classList.remove('in'); });
+    // 强制 reflow，确保浏览器注销旧动画后再重新触发
+    void document.body.offsetWidth;
+    reveals.forEach(function (el) { el.classList.add('in'); });
+}
 
-langToggle.addEventListener('click', () => {
-    const isEn = document.documentElement.getAttribute('data-lang') === 'en';
-    applyLang(isEn ? 'zh' : 'en');
-});
+if (langToggle) {
+    langToggle.addEventListener('click', () => {
+        applyLang(currentLang() === 'en' ? 'zh' : 'en');
+    });
+}
 
+/* ===== 主题切换 =====
+   橙色色块自上而下直线擦过全屏，在盖满屏幕的瞬间完成主题切换：
+   切换过程被完全遮住，也就不会出现“全站元素逐个渐变”的波浪感。 */
 const themeToggle = document.getElementById('themeToggle');
-const themeIcon = themeToggle.querySelector('.material-icons');
-const favicon = document.getElementById('favicon');
+const themeIcon = themeToggle ? themeToggle.querySelector('use') : null;
 
-function updateFavicon() {
-    favicon.href = 'assets/images/avatar.png';
+function isDark() {
+    return document.documentElement.getAttribute('data-theme') === 'dark';
 }
 
-const STORAGE_KEY = 'theme';
-const storedTheme = localStorage.getItem(STORAGE_KEY);
-const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-if (storedTheme === 'dark' || (storedTheme === null && prefersDark)) {
-    document.documentElement.setAttribute('data-theme', 'dark');
-    themeIcon.textContent = 'dark_mode';
-}
-updateFavicon();
-
-themeToggle.addEventListener('click', () => {
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    if (currentTheme === 'dark') {
-        document.documentElement.removeAttribute('data-theme');
-        themeIcon.textContent = 'wb_sunny';
-        localStorage.setItem(STORAGE_KEY, 'light');
-    } else {
+function setTheme(dark) {
+    if (dark) {
         document.documentElement.setAttribute('data-theme', 'dark');
-        themeIcon.textContent = 'dark_mode';
-        localStorage.setItem(STORAGE_KEY, 'dark');
+    } else {
+        document.documentElement.removeAttribute('data-theme');
     }
-    updateFavicon();
-});
+    if (themeIcon) themeIcon.setAttribute('href', dark ? '#i-moon' : '#i-sun');
+    try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch (e) {}
+}
+
+function prefersReducedMotion() {
+    return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+}
+
+// 初始化只同步图标状态；主题已由 head 内联脚本应用，不在这里重复写入偏好
+if (themeIcon) themeIcon.setAttribute('href', isDark() ? '#i-moon' : '#i-sun');
+
+let wiping = false;
+
+function toggleThemeWithWipe() {
+    if (wiping) return;
+    wiping = true;
+    const next = !isDark();
+
+    if (prefersReducedMotion()) {
+        setTheme(next);
+        wiping = false;
+        return;
+    }
+
+    const layer = document.createElement('div');
+    layer.className = 'theme-wipe';
+    // 擦除层用目标主题的真实背景色（深→#0F0F0F、浅→#FFFFFF），直线擦过时黑白直接变换
+    layer.style.setProperty('--wipe-color', next ? '#FFFFFF' : '#0F0F0F');
+    document.body.appendChild(layer);
+
+    let finished = false;
+    const finish = () => {
+        if (finished) return;
+        finished = true;
+        layer.remove();
+        wiping = false;
+    };
+
+    // 动画总时长 0.42s，在 50%（色块刚好盖满屏幕）的那一刻切换主题
+    setTimeout(() => setTheme(next), 210);
+    layer.addEventListener('animationend', finish);
+    setTimeout(finish, 900); // 动画事件意外丢失时的兜底
+
+    requestAnimationFrame(() => layer.classList.add('run'));
+}
+
+if (themeToggle) {
+    themeToggle.addEventListener('click', toggleThemeWithWipe);
+}
 
 const menuToggle = document.getElementById('menuToggle');
 const navLinks = document.querySelector('.nav-links');
@@ -73,50 +116,59 @@ function copyToClipboard(btn, text) {
     });
 }
 if (menuToggle && navLinks) {
-    menuToggle.addEventListener('click', function() {
-        navLinks.classList.toggle('active');
-        const icon = menuToggle.querySelector('.material-icons');
-        if (icon) {
-            icon.textContent = navLinks.classList.contains('active') ? 'close' : 'menu';
-        }
+    const menuIcon = menuToggle.querySelector('use');
+
+    function setMenuOpen(open) {
+        navLinks.classList.toggle('active', open);
+        menuToggle.setAttribute('aria-expanded', String(open));
+        if (menuIcon) menuIcon.setAttribute('href', open ? '#i-close' : '#i-menu');
+    }
+
+    menuToggle.addEventListener('click', function () {
+        setMenuOpen(!navLinks.classList.contains('active'));
     });
 
-    navLinks.querySelectorAll('a').forEach(function(link) {
-        link.addEventListener('click', function() {
-            navLinks.classList.remove('active');
-            const icon = menuToggle.querySelector('.material-icons');
-            if (icon) {
-                icon.textContent = 'menu';
-            }
-        });
+    navLinks.querySelectorAll('a').forEach(function (link) {
+        link.addEventListener('click', () => setMenuOpen(false));
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') setMenuOpen(false);
     });
 }
 
+/* ===== 滚动：进度条 + 返回顶部 =====
+   两者合并进同一帧处理，滚动过程中每帧最多读一次布局；
+   进度条用 transform: scaleX() 而非 width，避免触发重排。 */
 const backToTopBtn = document.getElementById('backToTop');
-if (backToTopBtn) {
-    window.addEventListener('scroll', function() {
-        if (window.scrollY > 300) {
-            backToTopBtn.classList.add('show');
-        } else {
-            backToTopBtn.classList.remove('show');
-        }
-    });
+const progressBar = document.querySelector('.progress-bar');
+let scrollQueued = false;
 
-    backToTopBtn.addEventListener('click', function() {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-    });
+function updateScrollUI() {
+    scrollQueued = false;
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    if (progressBar) {
+        const ratio = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+        progressBar.style.transform = 'scaleX(' + ratio + ')';
+    }
+    if (backToTopBtn) {
+        backToTopBtn.classList.toggle('show', window.scrollY > 300);
+    }
 }
 
-const progressBar = document.querySelector('.progress-bar');
-if (progressBar) {
-    window.addEventListener('scroll', function() {
-        const scrollTop = window.scrollY;
-        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-        const scrollPercent = (scrollTop / docHeight) * 100;
-        progressBar.style.width = scrollPercent + '%';
+function queueScrollUpdate() {
+    if (scrollQueued) return;
+    scrollQueued = true;
+    requestAnimationFrame(updateScrollUI);
+}
+
+window.addEventListener('scroll', queueScrollUpdate, { passive: true });
+window.addEventListener('resize', queueScrollUpdate, { passive: true });
+updateScrollUI();
+
+if (backToTopBtn) {
+    backToTopBtn.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 }
 
@@ -131,6 +183,7 @@ if (progressBar) {
     let sourceRect = null;
     let sourceImg = null;
     let sourceCard = null;
+    let lastFocused = null; // 打开预览前的焦点元素，关闭后归还给它
     let userScale = 1;
     let userTx = 0, userTy = 0; // 滚轮缩放后拖拽平移的偏移量
     let baseRect = null; // 打开稳定后的原始全屏内容矩形（未受滚轮缩放影响）
@@ -212,6 +265,8 @@ if (progressBar) {
         lightboxImg.src = img.src;
         lightboxImg.alt = img.alt || '';
         document.body.style.overflow = 'hidden';
+        lastFocused = document.activeElement;
+        lightbox.focus({ preventScroll: true });
 
         const start = function () {
             lightbox.classList.add('open', 'active');
@@ -240,6 +295,14 @@ if (progressBar) {
         }
     }
 
+    // 关闭预览后把焦点还给触发它的元素，键盘用户不会“丢失位置”
+    function restoreFocus() {
+        if (lastFocused && typeof lastFocused.focus === 'function') {
+            lastFocused.focus({ preventScroll: true });
+        }
+        lastFocused = null;
+    }
+
     function closeLightbox() {
         if (!sourceRect) {
             lightbox.classList.remove('active', 'open');
@@ -257,6 +320,7 @@ if (progressBar) {
             userTx = 0;
             userTy = 0;
             baseRect = null;
+            restoreFocus();
             return;
         }
         const t = fitTransform(sourceRect, baseRect); // 以原始全屏态为基准，缩放可平滑回落
@@ -287,6 +351,7 @@ if (progressBar) {
                 sourceCard = null;
             }
             sourceRect = null;
+            restoreFocus();
         }, 300);
     }
 
@@ -302,8 +367,15 @@ if (progressBar) {
         if (e.target === lightbox) closeLightbox();
     });
     document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && lightbox.classList.contains('open')) {
+        if (!lightbox.classList.contains('open')) return;
+        if (e.key === 'Escape') {
             closeLightbox();
+            return;
+        }
+        // 模态期间把焦点锁在关闭按钮上，避免 Tab 跑到背后的页面内容里
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            lightboxClose.focus();
         }
     });
 
@@ -430,11 +502,85 @@ if (progressBar) {
         }
 
         // 图片加载完成后，等当前这一个完整周期（出现→消失）播完再隐藏遮罩，避免跳帧
-        cover.addEventListener('animationiteration', function () {
+        const onIteration = function () {
             if (loaded) {
                 cover.classList.add('done');
-                cover.removeEventListener('animationiteration', arguments.callee);
+                cover.removeEventListener('animationiteration', onIteration);
             }
-        });
+        };
+        cover.addEventListener('animationiteration', onIteration);
     });
+})();
+
+/* ===== 滚动入场动效 =====
+   首屏之外的内容滚动到视口时依次浮现；同一容器内的卡片做 stagger。
+   .reveal 类由 JS 添加，脚本未执行时内容仍正常可见。 */
+(function () {
+    const targets = document.querySelectorAll(
+        '.section-title, .section-note, .project-category-title, .project-card, ' +
+        '.experience-card, .stack-category, .about-content'
+    );
+    if (!targets.length) return;
+
+    const counters = new Map();
+    targets.forEach(function (el) {
+        const parent = el.parentElement;
+        const index = counters.get(parent) || 0;
+        counters.set(parent, index + 1);
+        el.classList.add('reveal');
+        el.style.setProperty('--i', String(Math.min(index, 6)));
+    });
+
+    // 不支持 IntersectionObserver 时直接显示，避免内容永远停在透明状态
+    if (!('IntersectionObserver' in window)) {
+        targets.forEach(function (el) { el.classList.add('in'); });
+        return;
+    }
+
+    const io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('in');
+            io.unobserve(entry.target); // 只播一次
+        });
+    }, { rootMargin: '0px 0px -10% 0px', threshold: 0.08 });
+
+    targets.forEach(function (el) { io.observe(el); });
+})();
+
+/* ===== 导航高亮（scrollspy） ===== */
+(function () {
+    const links = Array.prototype.slice.call(document.querySelectorAll('.nav-links a[href^="#"]'));
+    if (!links.length || !('IntersectionObserver' in window)) return;
+
+    const sectionToLink = new Map();
+    links.forEach(function (link) {
+        const section = document.querySelector(link.getAttribute('href'));
+        if (section) sectionToLink.set(section, link);
+    });
+    if (!sectionToLink.size) return;
+
+    const visible = new Set();
+
+    function highlight() {
+        let active = null;
+        // Map 保持插入顺序（即文档顺序），取最靠上的可见区块
+        sectionToLink.forEach(function (link, section) {
+            if (!active && visible.has(section)) active = link;
+        });
+        links.forEach(function (link) {
+            link.classList.toggle('active', link === active);
+        });
+    }
+
+    // 视口中段的一条检测带，区块进入即视为“当前章节”
+    const io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+            if (entry.isIntersecting) visible.add(entry.target);
+            else visible.delete(entry.target);
+        });
+        highlight();
+    }, { rootMargin: '-25% 0px -60% 0px' });
+
+    sectionToLink.forEach(function (_link, section) { io.observe(section); });
 })();

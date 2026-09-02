@@ -4,12 +4,106 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sam-Fic | Portfolio</title>
-    <link rel="icon" id="favicon" href="assets/images/avatar.png" type="image/png" />
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <meta name="description"
+        content="Sam-Fic 的个人主页：机器人与强化学习方向的开源项目、竞赛经历与技术栈。 / Personal portfolio of Sam-Fic: open-source projects, competition experience and tech stack in robotics and reinforcement learning.">
+    <meta name="theme-color" content="#FF6600" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0F0F0F" media="(prefers-color-scheme: dark)">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Sam-Fic | Portfolio">
+    <meta property="og:title" content="Sam-Fic | Portfolio">
+    <meta property="og:description"
+        content="机器人与强化学习方向的开源项目、竞赛经历与技术栈。 / Open-source projects, competition experience and tech stack in robotics and reinforcement learning.">
+    <meta property="og:url" content="https://sam-fic.github.io/">
+    <meta property="og:image" content="https://sam-fic.github.io/assets/images/avatar.png">
+    <meta property="og:locale" content="zh_CN">
+    <meta property="og:locale:alternate" content="en_US">
+    <meta name="twitter:card" content="summary">
+
+    <link rel="icon" href="assets/images/avatar.png" type="image/png">
+    <link rel="preload" href="assets/fonts/MiSans-Demibold.ttf" as="font" type="font/ttf" crossorigin>
     <link rel="stylesheet" href="assets/css/style.css">
+
+    <!-- 在首屏渲染前应用主题与语言，避免闪烁（外链脚本太晚会闪一下白底/中文） -->
+    <script>
+        (function () {
+            var root = document.documentElement;
+            var theme = null;
+            try { theme = localStorage.getItem('theme'); } catch (e) {}
+            if (theme === 'dark' || (theme === null && window.matchMedia
+                && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                root.setAttribute('data-theme', 'dark');
+            }
+            var lang = null;
+            try { lang = localStorage.getItem('lang'); } catch (e) {}
+            if (!lang) {
+                lang = (navigator.language || 'zh').toLowerCase().indexOf('zh') === 0 ? 'zh' : 'en';
+            }
+            if (lang === 'en') root.setAttribute('data-lang', 'en');
+            root.setAttribute('lang', lang);
+        })();
+    </script>
 </head>
 <body>
+
+    <!-- 图标精灵：全部自托管内联，不再依赖 Google Fonts / Font Awesome CDN -->
+    <svg class="svg-sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+        <symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 4.8h18v2.4H3V4.8zm0 6h18v2.4H3v-2.4zm0 6h18v2.4H3v-2.4z"/></symbol>
+        <symbol id="i-close" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
+        <symbol id="i-sun" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="4.3"/>
+            <g>
+                <rect x="10.8" y="1.2" width="2.4" height="3.2"/>
+                <rect x="10.8" y="19.6" width="2.4" height="3.2"/>
+                <rect x="1.2" y="10.8" width="3.2" height="2.4"/>
+                <rect x="19.6" y="10.8" width="3.2" height="2.4"/>
+                <rect x="10.8" y="1.2" width="2.4" height="3.2" transform="rotate(45 12 12)"/>
+                <rect x="10.8" y="19.6" width="2.4" height="3.2" transform="rotate(45 12 12)"/>
+                <rect x="1.2" y="10.8" width="3.2" height="2.4" transform="rotate(45 12 12)"/>
+                <rect x="19.6" y="10.8" width="3.2" height="2.4" transform="rotate(45 12 12)"/>
+            </g>
+        </symbol>
+        <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></symbol>
+        <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square">
+            <rect x="3" y="4.9" width="18" height="14.2"/>
+            <path d="M3.6 6.6 12 12.2l8.4-5.6"/>
+        </symbol>
+        <symbol id="i-branch" viewBox="0 0 24 24">
+            <circle cx="6" cy="5" r="3"/>
+            <circle cx="6" cy="19" r="3"/>
+            <circle cx="18" cy="9.5" r="3"/>
+            <path d="M6 8v8M8.8 5h3.3a4.5 4.5 0 0 1 4.5 4.5" fill="none" stroke="currentColor" stroke-width="2.5"/>
+        </symbol>
+        <symbol id="i-laptop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square">
+            <rect x="3.4" y="5.2" width="17.2" height="11"/>
+            <path d="M1.6 19.6h20.8M10 9.1 8 11l2 1.9M14 9.1l2 1.9-2 1.9"/>
+        </symbol>
+        <symbol id="i-chip" viewBox="0 0 24 24">
+            <g fill="currentColor">
+                <path d="M9.2 2.6h2.6v3.4H9.2zM12.2 2.6h2.6v3.4h-2.6zM9.2 18h2.6v3.4H9.2zM12.2 18h2.6v3.4h-2.6zM2.6 9.2h3.4v2.6H2.6zM2.6 12.2h3.4v2.6H2.6zM18 9.2h3.4v2.6H18zM18 12.2h3.4v2.6H18z"/>
+            </g>
+            <g fill="none" stroke="currentColor" stroke-width="2.5">
+                <rect x="6" y="6" width="12" height="12"/>
+                <rect x="10" y="10" width="4" height="4"/>
+            </g>
+        </symbol>
+        <symbol id="i-robot" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <rect x="4" y="8.2" width="16" height="10.6"/>
+            <path d="M12 8.2V4.4M8.6 4.4h6.8M9.6 13.2h.01M14.4 13.2h.01" stroke-linecap="round"/>
+            <path d="M9.6 16h4.8" stroke-linecap="square"/>
+        </symbol>
+        <symbol id="i-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square">
+            <path d="M8.2 6.7 3.6 12l4.6 5.3M15.8 6.7l4.6 5.3-4.6 5.3M13.3 5.4l-2.6 13.2"/>
+        </symbol>
+        <symbol id="i-gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="12" cy="12" r="3"/>
+            <circle cx="12" cy="12" r="7.4"/>
+            <path d="M12 2.2v2.3M12 19.5v2.3M2.2 12h2.3M19.5 12h2.3M5.1 5.1l1.7 1.7M17.2 17.2l1.7 1.7M18.9 5.1l-1.7 1.7M6.8 17.2l-1.7 1.7"/>
+        </symbol>
+        <symbol id="i-github" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></symbol>
+        <symbol id="i-bilibili" viewBox="0 0 24 24"><path d="M17.813 4.653h.854c1.51.054 2.769.578 3.773 1.574 1.004.995 1.524 2.249 1.56 3.76v7.36c-.036 1.51-.556 2.769-1.56 3.773s-2.262 1.524-3.773 1.56H5.333c-1.51-.036-2.769-.556-3.773-1.56S.036 18.858 0 17.347v-7.36c.036-1.511.556-2.765 1.56-3.76 1.004-.996 2.262-1.52 3.773-1.574h.774l-1.174-1.12a1.234 1.234 0 0 1-.373-.906c0-.356.124-.658.373-.907l.027-.027c.267-.249.573-.373.92-.373.347 0 .653.124.92.373L9.653 4.44c.071.071.134.142.187.213h4.267a.836.836 0 0 1 .16-.213l2.853-2.747c.267-.249.573-.373.92-.373.347 0 .662.151.929.4.267.249.391.551.391.907 0 .355-.124.657-.373.906zM5.333 7.24c-.746.018-1.373.276-1.88.773-.506.498-.769 1.13-.786 1.894v7.52c.017.764.28 1.395.786 1.893.507.498 1.134.756 1.88.773h13.334c.746-.017 1.373-.275 1.88-.773.506-.498.769-1.129.786-1.893v-7.52c-.017-.765-.28-1.396-.786-1.894-.507-.497-1.134-.755-1.88-.773zM8 11.107c.373 0 .684.124.933.373.25.249.383.569.4.96v1.173c-.017.391-.15.711-.4.96-.249.25-.56.374-.933.374s-.684-.125-.933-.374c-.25-.249-.383-.569-.4-.96V12.44c0-.373.129-.689.386-.947.258-.257.574-.386.947-.386zm8 0c.373 0 .684.124.933.373.25.249.383.569.4.96v1.173c-.017.391-.15.711-.4.96-.249.25-.56.374-.933.374s-.684-.125-.933-.374c-.25-.249-.383-.569-.4-.96V12.44c.017-.391.15-.711.4-.96.249-.249.56-.373.933-.373Z"/></symbol>
+        <symbol id="i-gitee" viewBox="0 0 24 24"><path d="M11.984 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.016 0zm6.09 5.333c.328 0 .593.266.592.593v1.482a.594.594 0 0 1-.593.592H9.777c-.982 0-1.778.796-1.778 1.778v5.63c0 .327.266.592.593.592h5.63c.982 0 1.778-.796 1.778-1.778v-.296a.593.593 0 0 0-.592-.593h-4.15a.592.592 0 0 1-.592-.592v-1.482a.593.593 0 0 1 .593-.592h6.815c.327 0 .593.265.593.592v3.408a4 4 0 0 1-4 4H5.926a.593.593 0 0 1-.593-.593V9.778a4.444 4.444 0 0 1 4.445-4.444h8.296Z"/></symbol>
+    </svg>
 
     <!-- 导航栏 -->
     <header>
@@ -17,43 +111,43 @@
         <div class="nav-container">
             <a href="#" class="logo">Sam-Fic</a>
             <nav>
-                <ul class="nav-links">
+                <ul class="nav-links" id="navLinks">
                     <li>
                         <a href="#projects">
-                            <span lang="zh">开源项目</span>
-                            <span lang="en">Projects</span>
+                            <span data-lang="zh">开源项目</span>
+                            <span data-lang="en">Projects</span>
                         </a>
                     </li>
                     <li>
                         <a href="#experience">
-                            <span lang="zh">项目经历</span>
-                            <span lang="en">Experience</span>
+                            <span data-lang="zh">项目经历</span>
+                            <span data-lang="en">Experience</span>
                         </a>
                     </li>
                     <li>
                         <a href="#tech-stack">
-                            <span lang="zh">技术栈</span>
-                            <span lang="en">Stack</span>
+                            <span data-lang="zh">技术栈</span>
+                            <span data-lang="en">Stack</span>
                         </a>
                     </li>
                     <li>
                         <a href="#about">
-                            <span lang="zh">关于我</span>
-                            <span lang="en">About</span>
+                            <span data-lang="zh">关于我</span>
+                            <span data-lang="en">About</span>
                         </a>
                     </li>
                 </ul>
             </nav>
             <div class="nav-controls">
                 <button class="btn-control" id="langToggle">
-                    <span lang="zh">EN</span>
-                    <span lang="en">中</span>
+                    <span data-lang="zh">EN</span>
+                    <span data-lang="en">中</span>
                 </button>
-                <button class="btn-control" id="themeToggle">
-    <span class="material-icons">wb_sunny</span>
-</button>
-                <button class="btn-control hamburger" id="menuToggle" aria-label="菜单">
-                    <span class="material-icons">menu</span>
+                <button class="btn-control" id="themeToggle" aria-label="切换主题 / Toggle theme">
+                    <svg class="icon" aria-hidden="true"><use href="#i-sun"></use></svg>
+                </button>
+                <button class="btn-control hamburger" id="menuToggle" aria-label="菜单 / Menu" aria-expanded="false" aria-controls="navLinks">
+                    <svg class="icon" aria-hidden="true"><use href="#i-menu"></use></svg>
                 </button>
             </div>
         </div>
@@ -62,33 +156,33 @@
     <!-- 个人首屏 Section -->
     <section id="hero">
         <div class="avatar-container img-loader">
-            <img id="avatarImg" src="./assets/images/avatar.png" alt="Sam-Fic" style="width:100%;height:100%;object-fit:cover;">
+            <img id="avatarImg" src="./assets/images/avatar.png" alt="Sam-Fic" width="200" height="200" fetchpriority="high" decoding="async" style="width:100%;height:100%;object-fit:cover;">
             <div class="img-cover"></div>
         </div>
         <div class="hero-info">
-            <h1 lang="zh">你好，这里是 <span>Sam-Fic</span></h1>
-            <h1 lang="en">Hi, <span>Sam-Fic</span> here</h1>
+            <h1 data-lang="zh">你好，这里是 <span>Sam-Fic</span></h1>
+            <h1 data-lang="en">Hi, <span>Sam-Fic</span> here</h1>
             
-            <p class="hero-subtitle" lang="zh">全栈探索中 / 机器视觉与强化学习 / 喜欢贝斯 & 金属核</p>
-            <p class="hero-subtitle" lang="en">Full-stack Exploring / Machine Vision & Reinforcement Learning / Bass & metalcore fan</p>
+            <p class="hero-subtitle" data-lang="zh">全栈探索中 / 机器视觉与强化学习 / 喜欢贝斯 & 金属核</p>
+            <p class="hero-subtitle" data-lang="en">Full-stack Exploring / Machine Vision & Reinforcement Learning / Bass & metalcore fan</p>
             
             <div class="contact-links">
                 <a href="javascript:void(0)" onclick="copyToClipboard(this, 'samfic@foxmail.com')" class="btn-contact btn-email" data-copied="false">
                     <span class="btn-text-wrap">
-                        <i class="fas fa-envelope"></i>
-                        <span class="btn-text-normal" lang="zh">samfic@foxmail.com</span>
-                        <span class="btn-text-normal" lang="en">samfic@foxmail.com</span>
-                        <span class="btn-text-hover" lang="zh">点击复制邮箱</span>
-                        <span class="btn-text-hover" lang="en">Click to copy</span>
-                        <span class="btn-text-copied" lang="zh">已复制到剪贴板</span>
-                        <span class="btn-text-copied" lang="en">Copied to clipboard</span>
+                        <svg class="icon" aria-hidden="true"><use href="#i-mail"></use></svg>
+                        <span class="btn-text-normal" data-lang="zh">samfic@foxmail.com</span>
+                        <span class="btn-text-normal" data-lang="en">samfic@foxmail.com</span>
+                        <span class="btn-text-hover" data-lang="zh">点击复制邮箱</span>
+                        <span class="btn-text-hover" data-lang="en">Click to copy</span>
+                        <span class="btn-text-copied" data-lang="zh">已复制到剪贴板</span>
+                        <span class="btn-text-copied" data-lang="en">Copied to clipboard</span>
                     </span>
                 </a>
-                <a href="https://github.com/Sam-Fic" target="_blank" class="btn-contact">
-                    <i class="fab fa-github"></i> GitHub <span class="arrow"></span>&rarr;
+                <a href="https://github.com/Sam-Fic" target="_blank" rel="noopener" class="btn-contact">
+                    <svg class="icon" aria-hidden="true"><use href="#i-github"></use></svg> GitHub <span class="arrow"></span>&rarr;
                 </a>
-                <a href="https://space.bilibili.com/262500571?spm_id_from=333.1007.0.0" target="_blank" class="btn-contact">
-                    <i class="fab fa-bilibili"></i> Bilibili <span class="arrow"></span>&rarr;
+                <a href="https://space.bilibili.com/262500571?spm_id_from=333.1007.0.0" target="_blank" rel="noopener" class="btn-contact">
+                    <svg class="icon" aria-hidden="true"><use href="#i-bilibili"></use></svg> Bilibili <span class="arrow"></span>&rarr;
                 </a>
             </div>
         </div>
@@ -97,32 +191,32 @@
     <!-- 开源链接 Section -->
     <section id="projects">
         <h2 class="section-title">
-            <span lang="zh">开源项目</span>
-            <span lang="en">Open Source</span>
+            <span data-lang="zh">开源项目</span>
+            <span data-lang="en">Open Source</span>
         </h2>
         <p class="section-note">
-            <span lang="zh"><i class="fas fa-code-branch"></i> 分支图标表示该仓库并非从零编写，而是在 <i class="fab fa-github"></i> fork 他人仓库的基础上进行了修改与完善。</span>
-            <span lang="en"><i class="fas fa-code-branch"></i> The branch icon indicates this repository was not written from scratch, but forked from someone else's repo and then modified.</span>
+            <span data-lang="zh"><svg class="icon" aria-hidden="true"><use href="#i-branch"></use></svg> 分支图标表示该仓库并非从零编写，而是在 <svg class="icon" aria-hidden="true"><use href="#i-github"></use></svg> fork 他人仓库的基础上进行了修改与完善。</span>
+            <span data-lang="en"><svg class="icon" aria-hidden="true"><use href="#i-branch"></use></svg> The branch icon indicates this repository was not written from scratch, but forked from someone else's repo and then modified.</span>
         </p>
         <!-- 软件类 -->
         <div class="project-group">
             <h3 class="project-category-title">
-                <span lang="zh"><i class="fas fa-laptop-code"></i> 软件</span>
-                <span lang="en"><i class="fas fa-laptop-code"></i> Software</span>
+                <span data-lang="zh"><svg class="icon" aria-hidden="true"><use href="#i-laptop"></use></svg> 软件</span>
+                <span data-lang="en"><svg class="icon" aria-hidden="true"><use href="#i-laptop"></use></svg> Software</span>
             </h3>
             <div class="project-grid">
                 <!-- 卡片 1 -->
                 <div class="project-card">
                     <div class="project-image img-loader">
-                        <img class="zoomable" src="assets/images/fliecollector.png" alt="FileCollector" style="width: 100%; height: 100%; object-fit: contain;">
+                        <img class="zoomable" loading="lazy" decoding="async" src="assets/images/fliecollector.png" alt="FileCollector" style="width: 100%; height: 100%; object-fit: contain;">
                         <div class="img-cover"></div>
                     </div>
                     <div>
-                        <h3 lang="zh">FileCollector</h3>
-                        <h3 lang="en">FileCollector</h3>
-                        <p lang="zh">FileCollector 是一款跨平台的桌面小工具，用于高效收集、编排工作目录中的文件并生成合并文本。
+                        <h3 data-lang="zh">FileCollector</h3>
+                        <h3 data-lang="en">FileCollector</h3>
+                        <p data-lang="zh">FileCollector 是一款跨平台的桌面小工具，用于高效收集、编排工作目录中的文件并生成合并文本。
                         它提供了可勾选的目录树、灵活的编排列表、文字插入和编码自动检测，非常适合将项目中的关键代码或文档快速整合成一个 TXT 文件，供后续分析或提交给大语言模型使用。配套有 CLI 与 MCP 服务，可实现自动化操作。</p>
-                        <p lang="en">FileCollector is a cross-platform desktop utility designed for efficiently gathering and organizing files from
+                        <p data-lang="en">FileCollector is a cross-platform desktop utility designed for efficiently gathering and organizing files from
                         working directories into a single merged text file.
                         It features a checkable directory tree, a flexible organization list, text insertion capabilities, and automatic
                         encoding detection—making it ideal for quickly consolidating important code snippets or documents from a project into
@@ -130,11 +224,11 @@
                         Additionally, FileCollector offers both a Command-Line Interface (CLI) and an MCP service to enable automated workflows.</p>
                     </div>
                     <div class="project-links">
-                        <a href="https://github.com/Sam-Fic/filecollector" target="_blank" class="project-link">
-                            <i class="fab fa-github"></i> <span lang="zh">Libadwaita</span><span lang="en">Libadwaita</span> <span class="arrow"></span>&rarr;
+                        <a href="https://github.com/Sam-Fic/filecollector" target="_blank" rel="noopener" class="project-link">
+                            <svg class="icon" aria-hidden="true"><use href="#i-github"></use></svg> <span data-lang="zh">Libadwaita</span><span data-lang="en">Libadwaita</span> <span class="arrow"></span>&rarr;
                         </a>
-                        <a href="https://github.com/Sam-Fic/filecollector-flet" target="_blank" class="project-link">
-                            <i class="fab fa-github"></i> <span lang="zh">Flet</span><span lang="en">Flet</span> <span class="arrow"></span>&rarr;
+                        <a href="https://github.com/Sam-Fic/filecollector-flet" target="_blank" rel="noopener" class="project-link">
+                            <svg class="icon" aria-hidden="true"><use href="#i-github"></use></svg> <span data-lang="zh">Flet</span><span data-lang="en">Flet</span> <span class="arrow"></span>&rarr;
                         </a>
                     </div>
                 </div>
@@ -142,34 +236,34 @@
                 <!-- 卡片 2 -->
                 <div class="project-card">
                     <div class="project-image img-loader">
-                        <img class="zoomable" src="assets/images/NeoSzyszka.png" alt="NeoSzyszka" style="width: 100%; height: 100%; object-fit: contain;">
+                        <img class="zoomable" loading="lazy" decoding="async" src="assets/images/NeoSzyszka.png" alt="NeoSzyszka" style="width: 100%; height: 100%; object-fit: contain;">
                         <div class="img-cover"></div>
                     </div>
                     <div>
-                        <h3 lang="zh">NeoSzyszka</h3>
-                        <h3 lang="en">NeoSzyszka</h3>
-                        <p lang="zh">基于 GTK 4 和 Libadwaita 重写的批量文件重命名工具，支持正则表达式替换、文本修剪、编号、大小写转换等丰富规则，可跨平台运行于 Linux、macOS 和 Windows。</p>
-                        <p lang="en">A bulk file renamer rewritten with GTK 4 and Libadwaita, featuring rich rules like regex replacement, text trimming, numbering, case conversion, and more. Cross-platform support for Linux, macOS, and Windows.</p>
+                        <h3 data-lang="zh">NeoSzyszka</h3>
+                        <h3 data-lang="en">NeoSzyszka</h3>
+                        <p data-lang="zh">基于 GTK 4 和 Libadwaita 重写的批量文件重命名工具，支持正则表达式替换、文本修剪、编号、大小写转换等丰富规则，可跨平台运行于 Linux、macOS 和 Windows。</p>
+                        <p data-lang="en">A bulk file renamer rewritten with GTK 4 and Libadwaita, featuring rich rules like regex replacement, text trimming, numbering, case conversion, and more. Cross-platform support for Linux, macOS, and Windows.</p>
                     </div>
-                    <a href="https://github.com/Sam-Fic/NeoSzyszka" target="_blank" class="project-link">
-                        <i class="fab fa-github"></i> <i class="fas fa-code-branch" style="margin-left: 3px; font-size: 0.9em; opacity: 1;"></i> GitHub <span class="arrow"></span>&rarr;
+                    <a href="https://github.com/Sam-Fic/NeoSzyszka" target="_blank" rel="noopener" class="project-link">
+                        <svg class="icon" aria-hidden="true"><use href="#i-github"></use></svg> <svg class="icon icon-fork" aria-hidden="true"><use href="#i-branch"></use></svg> GitHub <span class="arrow"></span>&rarr;
                     </a>
                 </div>
 
                 <!-- 卡片 3 -->
                 <div class="project-card">
                     <div class="project-image img-loader">
-                        <img class="zoomable" src="assets/images/NeoSetzer.png" alt="NeoSetzer" style="width: 100%; height: 100%; object-fit: contain;">
+                        <img class="zoomable" loading="lazy" decoding="async" src="assets/images/NeoSetzer.png" alt="NeoSetzer" style="width: 100%; height: 100%; object-fit: contain;">
                         <div class="img-cover"></div>
                     </div>
                     <div>
-                        <h3 lang="zh">NeoSetzer</h3>
-                        <h3 lang="en">NeoSetzer</h3>
-                        <p lang="zh">基于 Python 与 GTK 开发的 LaTeX 编辑器，支持 Linux 与 Windows 双平台。提供语法高亮、PDF 预览、符号侧边栏、自动补全等丰富功能，并可通过 meson 构建或直接运行开发版本。</p>
-                        <p lang="en">A LaTeX editor written in Python with GTK, supporting both Linux and Windows. It features syntax highlighting, PDF preview, a symbol sidebar, autocompletion, and more. Can be built with meson or run directly in development mode.</p>
+                        <h3 data-lang="zh">NeoSetzer</h3>
+                        <h3 data-lang="en">NeoSetzer</h3>
+                        <p data-lang="zh">基于 Python 与 GTK 开发的 LaTeX 编辑器，支持 Linux 与 Windows 双平台。提供语法高亮、PDF 预览、符号侧边栏、自动补全等丰富功能，并可通过 meson 构建或直接运行开发版本。</p>
+                        <p data-lang="en">A LaTeX editor written in Python with GTK, supporting both Linux and Windows. It features syntax highlighting, PDF preview, a symbol sidebar, autocompletion, and more. Can be built with meson or run directly in development mode.</p>
                     </div>
-                    <a href="https://github.com/Sam-Fic/NeoSetzer" target="_blank" class="project-link">
-                        <i class="fab fa-github"></i> <i class="fas fa-code-branch" style="margin-left: 3px; font-size: 0.9em; opacity: 1;"></i> GitHub <span class="arrow"></span>&rarr;
+                    <a href="https://github.com/Sam-Fic/NeoSetzer" target="_blank" rel="noopener" class="project-link">
+                        <svg class="icon" aria-hidden="true"><use href="#i-github"></use></svg> <svg class="icon icon-fork" aria-hidden="true"><use href="#i-branch"></use></svg> GitHub <span class="arrow"></span>&rarr;
                     </a>
                 </div>
             </div>
@@ -178,41 +272,41 @@
         <!-- 硬件类 -->
         <div class="project-group">
             <h3 class="project-category-title">
-                <span lang="zh"><i class="fas fa-microchip"></i> 工程</span>
-                <span lang="en"><i class="fas fa-microchip"></i> Engineering</span>
+                <span data-lang="zh"><svg class="icon" aria-hidden="true"><use href="#i-chip"></use></svg> 工程</span>
+                <span data-lang="en"><svg class="icon" aria-hidden="true"><use href="#i-chip"></use></svg> Engineering</span>
             </h3>
             <div class="project-grid">
                 <!-- 卡片 4 -->
                 <div class="project-card">
                     <div class="project-image img-loader">
-                        <img class="zoomable" src="assets/images/turtle.gif" alt="强化学习机器乌龟" style="width: 100%; height: 100%; object-fit: cover;">
+                        <img class="zoomable" loading="lazy" decoding="async" src="assets/images/turtle.gif" alt="强化学习机器乌龟">
                         <div class="img-cover"></div>
                     </div>
                     <div>
-                        <h3 lang="zh">强化学习机器乌龟</h3>
-                        <h3 lang="en">Turtle RL Locomotion</h3>
-                        <p lang="zh">基于 MuJoCo 仿真环境与 Stable-Baselines3 框架的机器乌龟强化学习系统。尝试在不参考真实乌龟爬行方式的前提下，通过强化学习算法探索适合机器乌龟的爬行姿态。</p>
-                        <p lang="en">A reinforcement learning system for robotic turtles based on the MuJoCo simulation environment and the Stable-Baselines3 framework. This system attempts to discover optimal crawling postures for robotic turtles through reinforcement learning algorithms, without relying on any reference data from real turtle movements.</p>
+                        <h3 data-lang="zh">强化学习机器乌龟</h3>
+                        <h3 data-lang="en">Turtle RL Locomotion</h3>
+                        <p data-lang="zh">基于 MuJoCo 仿真环境与 Stable-Baselines3 框架的机器乌龟强化学习系统。尝试在不参考真实乌龟爬行方式的前提下，通过强化学习算法探索适合机器乌龟的爬行姿态。</p>
+                        <p data-lang="en">A reinforcement learning system for robotic turtles based on the MuJoCo simulation environment and the Stable-Baselines3 framework. This system attempts to discover optimal crawling postures for robotic turtles through reinforcement learning algorithms, without relying on any reference data from real turtle movements.</p>
                     </div>
-                    <a href="https://github.com/Sam-Fic/turtle-rl-locomotion" target="_blank" class="project-link">
-                        <i class="fab fa-github"></i> <i class="fas fa-code-branch" style="margin-left: 3px; font-size: 0.9em; opacity: 1;"></i> GitHub <span class="arrow"></span>&rarr;
+                    <a href="https://github.com/Sam-Fic/turtle-rl-locomotion" target="_blank" rel="noopener" class="project-link">
+                        <svg class="icon" aria-hidden="true"><use href="#i-github"></use></svg> <svg class="icon icon-fork" aria-hidden="true"><use href="#i-branch"></use></svg> GitHub <span class="arrow"></span>&rarr;
                     </a>
                 </div>
 
                 <!-- 卡片 5 -->
                 <div class="project-card">
                     <div class="project-image img-loader">
-                        <img class="zoomable" src="assets/images/uav.png" alt="UAV / 船模综合遥控系统" style="width: 100%; height: 100%; object-fit: cover;">
+                        <img class="zoomable" loading="lazy" decoding="async" src="assets/images/uav.png" alt="UAV / 船模综合遥控系统">
                         <div class="img-cover"></div>
                     </div>
                     <div>
-                        <h3 lang="zh">电网无人机上层机构遥控系统</h3>
-                        <h3 lang="en">Power Grid UAV Top-Level RC System</h3>
-                        <p lang="zh">基于 Arduino 的遥控控制系统，实现多执行机构控制（推进电机、推杆、舵机），具备模块化设计、信号抗干扰优化及安全启动机制。</p>
-                        <p lang="en">Arduino-based RC control system for multi-actuator control (propulsion motor, linear actuator, servos), featuring modular design, signal anti-interference optimization, and safe boot mechanism.</p>
+                        <h3 data-lang="zh">电网无人机上层机构遥控系统</h3>
+                        <h3 data-lang="en">Power Grid UAV Top-Level RC System</h3>
+                        <p data-lang="zh">基于 Arduino 的遥控控制系统，实现多执行机构控制（推进电机、推杆、舵机），具备模块化设计、信号抗干扰优化及安全启动机制。</p>
+                        <p data-lang="en">Arduino-based RC control system for multi-actuator control (propulsion motor, linear actuator, servos), featuring modular design, signal anti-interference optimization, and safe boot mechanism.</p>
                     </div>
-                    <a href="https://gitee.com/samfic/uav_control" target="_blank" class="project-link">
-                        <i class="fab fa-git-alt"></i> Gitee <span class="arrow"></span>&rarr;
+                    <a href="https://gitee.com/samfic/uav_control" target="_blank" rel="noopener" class="project-link">
+                        <svg class="icon" aria-hidden="true"><use href="#i-gitee"></use></svg> Gitee <span class="arrow"></span>&rarr;
                     </a>
                 </div>
             </div>
@@ -222,8 +316,8 @@
     <!-- 项目经历 Section -->
     <section id="experience">
         <h2 class="section-title">
-            <span lang="zh">项目经历</span>
-            <span lang="en">Experience</span>
+            <span data-lang="zh">项目经历</span>
+            <span data-lang="en">Experience</span>
         </h2>
 
         <div class="experience-list">
@@ -232,34 +326,34 @@
                 <!-- 左侧图片 -->
                 <div class="exp-image img-loader">
                     <!-- 替换 src 为你的真实图片路径，如果没有，这里会显示文字占位符 -->
-                    <img class="zoomable" src="assets/images/robocon-2026.png" alt="第二十五届全国大学生机器人大赛 ROBOCON"
+                    <img class="zoomable" loading="lazy" decoding="async" src="assets/images/robocon-2026.png" alt="第二十五届全国大学生机器人大赛 ROBOCON"
                         style="width: 100%; height: 100%; object-fit: cover;">
                     <div class="img-cover"></div>
                 </div>
                 <!-- 右侧信息 -->
                 <div class="exp-info">
                     <div>
-                        <h3 class="exp-title" lang="zh">第二十五届全国大学生机器人大赛 ROBOCON</h3>
-                        <h3 class="exp-title" lang="en">25th National College Student Robot Competition ROBOCON</h3>
+                        <h3 class="exp-title" data-lang="zh">第二十五届全国大学生机器人大赛 ROBOCON</h3>
+                        <h3 class="exp-title" data-lang="en">25th National College Student Robot Competition ROBOCON</h3>
             
                         <!-- 时间 (橙色) -->
                         <time class="exp-time">
-                            <span lang="zh">2026 年 7 月</span>
-                            <span lang="en">Jul 2026</span>
+                            <span data-lang="zh">2026 年 7 月</span>
+                            <span data-lang="en">Jul 2026</span>
                         </time>
             
-                        <p class="exp-desc" lang="zh">
+                        <p class="exp-desc" data-lang="zh">
                             主导激光雷达模块的开发。基于 MID-360 及 Odin1 激光雷达硬件平台，采用 ROS2 系统架构，整合 FastLIO SLAM 算法实现 3D 点云地图构建，并通过 ICP
                             算法完成机器人实时重定位，为赛场机器人提供可靠的定位信息。
                         </p>
-                        <p class="exp-desc" lang="en">
+                        <p class="exp-desc" data-lang="en">
                             Spearheading LiDAR module development. Built upon the MID-360 and Odin1 LiDAR hardware platform with ROS2
                             architecture, integrated FastLIO SLAM algorithm for 3D point cloud mapping, and implemented real-time
                             robot relocalization via ICP algorithm, providing localization support for arena robots.
                         </p>
                     </div>
                     <!-- 如果需要链接，可以在这里加一个箭头按钮 -->
-                    <!-- <a href="#" class="project-link" style="align-self: flex-start; margin-top: 1rem;"><span lang="zh">查看详情</span><span lang="en">View Details</span> &rarr;</a> -->
+                    <!-- <a href="#" class="project-link" style="align-self: flex-start; margin-top: 1rem;"><span data-lang="zh">查看详情</span><span data-lang="en">View Details</span> &rarr;</a> -->
                 </div>
             </div>
     
@@ -268,30 +362,30 @@
                 <!-- 左侧图片 -->
                 <div class="exp-image img-loader">
                     <!-- 替换 src 为你的真实图片路径，如果没有，这里会显示文字占位符 -->
-                    <img class="zoomable" src="assets/images/future-flight-2025.png" alt="“智驭空天” 第十一届中国研究生未来飞行器创新大赛" style="width: 100%; height: 100%; object-fit: cover;">
+                    <img class="zoomable" loading="lazy" decoding="async" src="assets/images/future-flight-2025.png" alt="“智驭空天” 第十一届中国研究生未来飞行器创新大赛" style="width: 100%; height: 100%; object-fit: cover;">
                     <div class="img-cover"></div>
                 </div>
                 <!-- 右侧信息 -->
                 <div class="exp-info">
                     <div>
-                        <h3 class="exp-title" lang="zh">“智驭空天” 第十一届中国研究生未来飞行器创新大赛</h3>
-                        <h3 class="exp-title" lang="en">The 11th China Graduate Future Flight Vehicle Innovation Competition</h3>
+                        <h3 class="exp-title" data-lang="zh">“智驭空天” 第十一届中国研究生未来飞行器创新大赛</h3>
+                        <h3 class="exp-title" data-lang="en">The 11th China Graduate Future Flight Vehicle Innovation Competition</h3>
                         
                         <!-- 时间 (橙色) -->
                         <time class="exp-time">
-                            <span lang="zh">2025 年 12 月</span>
-                            <span lang="en">Dec 2025</span>
+                            <span data-lang="zh">2025 年 12 月</span>
+                            <span data-lang="en">Dec 2025</span>
                         </time>
                         
-                        <p class="exp-desc" lang="zh">
+                        <p class="exp-desc" data-lang="zh">
                             响应低空经济发展需求，设计无人机及爬缆装置。提出可飞行可悬挂的电力巡检无人机方案。使用 Arduino 单片机及独立遥控器构建控制系统，实现无人机上层主动悬挂机构的闭环控制。
                         </p>
-                        <p class="exp-desc" lang="en">
+                        <p class="exp-desc" data-lang="en">
                             In response to the development needs of the low-altitude economy, a drone and cable-climbing device were designed. A novel solution involving a flight-capable drone with suspended operation capabilities was proposed for power line inspection tasks. A control system based on an Arduino microcontroller and a dedicated remote controller was developed to achieve closed-loop control of the drone’s upper-layer active suspension mechanism.
                         </p>
                     </div>
                     <!-- 如果需要链接，可以在这里加一个箭头按钮 -->
-                    <!-- <a href="#" class="project-link" style="align-self: flex-start; margin-top: 1rem;"><span lang="zh">查看详情</span><span lang="en">View Details</span> &rarr;</a> -->
+                    <!-- <a href="#" class="project-link" style="align-self: flex-start; margin-top: 1rem;"><span data-lang="zh">查看详情</span><span data-lang="en">View Details</span> &rarr;</a> -->
                 </div>
             </div>
 
@@ -300,30 +394,30 @@
                 <!-- 左侧图片 -->
                 <div class="exp-image img-loader">
                     <!-- 替换 src 为你的真实图片路径，如果没有，这里会显示文字占位符 -->
-                    <img class="zoomable" src="assets/images/fujian-robot-2025.png" alt="2025 年福建省大学生机器人大赛暨海峡两岸大学生机器人竞赛与工程交流会" style="width: 100%; height: 100%; object-fit: cover;">
+                    <img class="zoomable" loading="lazy" decoding="async" src="assets/images/fujian-robot-2025.png" alt="2025 年福建省大学生机器人大赛暨海峡两岸大学生机器人竞赛与工程交流会" style="width: 100%; height: 100%; object-fit: cover;">
                     <div class="img-cover"></div>
                 </div>
                 <!-- 右侧信息 -->
                 <div class="exp-info">
                     <div>
-                        <h3 class="exp-title" lang="zh">2025 年福建省大学生机器人大赛</h3>
-                        <h3 class="exp-title" lang="en">2025 Fujian Provincial College Students’ Robotics Competition & Cross-Strait Robotics Contest and Engineering Exchange Conference</h3>
+                        <h3 class="exp-title" data-lang="zh">2025 年福建省大学生机器人大赛</h3>
+                        <h3 class="exp-title" data-lang="en">2025 Fujian Provincial College Students’ Robotics Competition & Cross-Strait Robotics Contest and Engineering Exchange Conference</h3>
                         
                         <!-- 时间 (橙色) -->
                         <time class="exp-time">
-                            <span lang="zh">2025 年 11 月</span>
-                            <span lang="en">Nov 2025</span>
+                            <span data-lang="zh">2025 年 11 月</span>
+                            <span data-lang="en">Nov 2025</span>
                         </time>
                         
-                        <p class="exp-desc" lang="zh">
+                        <p class="exp-desc" data-lang="zh">
                             引入激光雷达进行 SLAM 建图，生成环境的 2D 点云地图用于全局路径规划。同时基于 OpenCV 负责目标识别与定位，并通过串口将识别结果实时上报至控制系统。
                         </p>
-                        <p class="exp-desc" lang="en">
+                        <p class="exp-desc" data-lang="en">
                             Integrated LiDAR for SLAM mapping, generating 2D point cloud maps of the environment for global path planning. Developed target recognition and localization using OpenCV, with results transmitted to the control system via serial communication.
                         </p>
                     </div>
                     <!-- 如果需要链接，可以在这里加一个箭头按钮 -->
-                    <!-- <a href="#" class="project-link" style="align-self: flex-start; margin-top: 1rem;"><span lang="zh">查看详情</span><span lang="en">View Details</span> &rarr;</a> -->
+                    <!-- <a href="#" class="project-link" style="align-self: flex-start; margin-top: 1rem;"><span data-lang="zh">查看详情</span><span data-lang="en">View Details</span> &rarr;</a> -->
                 </div>
             </div>
 
@@ -331,20 +425,20 @@
                 <!-- 左侧图片 -->
                 <div class="exp-image img-loader">
                     <!-- 替换 src 为你的真实图片路径，如果没有，这里会显示文字占位符 -->
-                        <img class="zoomable" src="assets/images/XMU-drone-delivery.gif" alt="厦门大学校园无人机配送项目"
+                        <img class="zoomable" loading="lazy" decoding="async" src="assets/images/XMU-drone-delivery.gif" alt="厦门大学校园无人机配送项目"
                         style="width: 100%; height: 100%; object-fit: cover;">
                     <div class="img-cover"></div>
                 </div>
                 <!-- 右侧信息 -->
                 <div class="exp-info">
                     <div>
-                        <h3 class="exp-title" lang="zh">厦门大学校园无人机配送项目</h3>
-                        <h3 class="exp-title" lang="en">Xiamen University Campus Drone Delivery Project</h3>
+                        <h3 class="exp-title" data-lang="zh">厦门大学校园无人机配送项目</h3>
+                        <h3 class="exp-title" data-lang="en">Xiamen University Campus Drone Delivery Project</h3>
                         
-                        <p class="exp-desc" lang="zh">
+                        <p class="exp-desc" data-lang="zh">
                             负责第二版无人机外形设计，优化八轴无人机的机架及舵机安装位置，将碳管排布设计为叠放式、舵机安装为上下交错型，减少机架所需碳管材料的加工次数、避免了旋翼之间的干涉并提升了整机强度。
                         </p>
-                        <p class="exp-desc" lang="en">
+                        <p class="exp-desc" data-lang="en">
                             Responsible for the second-generation drone design: optimized the frame structure and servo mounting layout of the
                             octocopter. Designed carbon tubes to be stacked vertically and arranged servos in a staggered top-bottom configuration,
                             thereby reducing the number of required carbon tube processing steps, preventing interference between propellers, and
@@ -352,7 +446,7 @@
                         </p>
                     </div>
                     <!-- 如果需要链接，可以在这里加一个箭头按钮 -->
-                    <!-- <a href="#" class="project-link" style="align-self: flex-start; margin-top: 1rem;"><span lang="zh">查看详情</span><span lang="en">View Details</span> &rarr;</a> -->
+                    <!-- <a href="#" class="project-link" style="align-self: flex-start; margin-top: 1rem;"><span data-lang="zh">查看详情</span><span data-lang="en">View Details</span> &rarr;</a> -->
                 </div>
             </div>
 
@@ -360,20 +454,20 @@
                 <!-- 左侧图片 -->
                 <div class="exp-image img-loader">
                     <!-- 替换 src 为你的真实图片路径，如果没有，这里会显示文字占位符 -->
-                        <img class="zoomable" src="assets/images/microcontroller-applications.gif" alt="自然语言控制无人机飞行行为课程设计"
+                        <img class="zoomable" loading="lazy" decoding="async" src="assets/images/microcontroller-applications.gif" alt="自然语言控制无人机飞行行为课程设计"
                         style="width: 100%; height: 100%; object-fit: cover;">
                     <div class="img-cover"></div>
                 </div>
                 <!-- 右侧信息 -->
                 <div class="exp-info">
                     <div>
-                        <h3 class="exp-title" lang="zh">自然语言控制无人机飞行行为课程设计</h3>
-                        <h3 class="exp-title" lang="en">Course Design: Natural Language-Based Control of Drone Flight Behaviors</h3>
+                        <h3 class="exp-title" data-lang="zh">自然语言控制无人机飞行行为课程设计</h3>
+                        <h3 class="exp-title" data-lang="en">Course Design: Natural Language-Based Control of Drone Flight Behaviors</h3>
             
-                        <p class="exp-desc" lang="zh">
+                        <p class="exp-desc" data-lang="zh">
                             灵感来自启智社区 LLM 微调开源项目。通过调用 Tello 官方提供的 Python 控制 API，调用 LLM 将自然语言转换为格式化的控制指令并加以语法检查和超时防护等特性，实现利用自然语言控制 Tello 无人机的飞行行为。
                         </p>
-                        <p class="exp-desc" lang="en">
+                        <p class="exp-desc" data-lang="en">
                             Inspired by open-source projects on LLM fine-tuning within the OpenI AI Collaboration Platform, this project leverages the official
                             Python control API provided by Tello. It employs an LLM to convert natural language inputs into structured control
                             commands, while integrating syntax validation and timeout protection mechanisms, thus enabling intuitive natural
@@ -381,7 +475,7 @@
                         </p>
                     </div>
                     <!-- 如果需要链接，可以在这里加一个箭头按钮 -->
-                    <!-- <a href="#" class="project-link" style="align-self: flex-start; margin-top: 1rem;"><span lang="zh">查看详情</span><span lang="en">View Details</span> &rarr;</a> -->
+                    <!-- <a href="#" class="project-link" style="align-self: flex-start; margin-top: 1rem;"><span data-lang="zh">查看详情</span><span data-lang="en">View Details</span> &rarr;</a> -->
                 </div>
             </div>
 
@@ -390,20 +484,20 @@
                 <!-- 左侧图片 -->
                 <div class="exp-image img-loader">
                     <!-- 替换 src 为你的真实图片路径，如果没有，这里会显示文字占位符 -->
-                    <img class="zoomable" src="assets/images/flightgear_screenshot.jpg" alt="飞行控制综合实验"
+                    <img class="zoomable" loading="lazy" decoding="async" src="assets/images/flightgear_screenshot.jpg" alt="飞行控制综合实验"
                         style="width: 100%; height: 100%; object-fit: cover;">
                     <div class="img-cover"></div>
                 </div>
                 <!-- 右侧信息 -->
                 <div class="exp-info">
                     <div>
-                        <h3 class="exp-title" lang="zh">飞行控制综合实验</h3>
-                        <h3 class="exp-title" lang="en">Integrated Flight Control Experiment</h3>
+                        <h3 class="exp-title" data-lang="zh">飞行控制综合实验</h3>
+                        <h3 class="exp-title" data-lang="en">Integrated Flight Control Experiment</h3>
             
-                        <p class="exp-desc" lang="zh">
+                        <p class="exp-desc" data-lang="zh">
                             在 Matlab/Simulink 中建立六自由度刚体模型，用根轨迹法整定俯仰、迎角与横航向三通道控制增益，并设计三阶段着陆制导与蒙特卡洛敏感度分析；将 Simulink 模型移植为 C 代码，实现内外环级联 PID、四边航路制导与抗积分饱和，并借助 FlightGear 进行三维可视化；把 C 仿真进一步移植到 STM32，通过串口私有协议与 PC 端构成硬件在环（HIL）仿真系统。
                         </p>
-                        <p class="exp-desc" lang="en">
+                        <p class="exp-desc" data-lang="en">
                             A six-degree-of-freedom rigid-body model is built in Matlab/Simulink, where pitch, angle-of-attack and lateral-directional
                             loop gains are tuned via root-locus design, together with three-phase landing guidance and Monte-Carlo sensitivity
                             analysis. The Simulink model is then ported to C, realizing cascaded inner/outer-loop PIDs, a four-leg waypoint navigator
@@ -412,7 +506,7 @@
                         </p>
                     </div>
                     <!-- 如果需要链接，可以在这里加一个箭头按钮 -->
-                    <!-- <a href="#" class="project-link" style="align-self: flex-start; margin-top: 1rem;"><span lang="zh">查看详情</span><span lang="en">View Details</span> &rarr;</a> -->
+                    <!-- <a href="#" class="project-link" style="align-self: flex-start; margin-top: 1rem;"><span data-lang="zh">查看详情</span><span data-lang="en">View Details</span> &rarr;</a> -->
                 </div>
             </div>
 
@@ -422,14 +516,17 @@
     <!-- 技术栈 Section -->
     <section id="tech-stack">
         <h2 class="section-title">
-            <span lang="zh">技术栈</span>
-            <span lang="en">Tech Stack</span>
+            <span data-lang="zh">技术栈</span>
+            <span data-lang="en">Tech Stack</span>
         </h2>
         <div class="stack-grid">
             <!-- 分类 1 -->
             <div class="stack-category">
-                <h3 lang="zh">机器人与工程</h3>
-                <h3 lang="en">Robotics & Engineering</h3>
+                <h3 class="stack-title">
+                    <svg class="icon icon-lead" aria-hidden="true"><use href="#i-robot"></use></svg>
+                    <span data-lang="zh">机器人与工程</span>
+                    <span data-lang="en">Robotics &amp; Engineering</span>
+                </h3>
                 <div class="tag-list">
                     <span class="tag">SolidWorks</span>
                     <span class="tag">MuJoCo</span>
@@ -439,8 +536,11 @@
 
             <!-- 分类 2 -->
             <div class="stack-category">
-                <h3 lang="zh">编程语言</h3>
-                <h3 lang="en">Languages</h3>
+                <h3 class="stack-title">
+                    <svg class="icon icon-lead" aria-hidden="true"><use href="#i-code"></use></svg>
+                    <span data-lang="zh">编程语言</span>
+                    <span data-lang="en">Languages</span>
+                </h3>
                 <div class="tag-list">
                     <span class="tag">Python</span>
                     <span class="tag">C / C++</span>
@@ -450,8 +550,11 @@
 
             <!-- 分类 3 -->
             <div class="stack-category">
-                <h3 lang="zh">嵌入式开发</h3>
-                <h3 lang="en">Embedded</h3>
+                <h3 class="stack-title">
+                    <svg class="icon icon-lead" aria-hidden="true"><use href="#i-chip"></use></svg>
+                    <span data-lang="zh">嵌入式开发</span>
+                    <span data-lang="en">Embedded</span>
+                </h3>
                 <div class="tag-list">
                     <span class="tag">Keil MDK</span>
                     <span class="tag">Arduino IDE</span>
@@ -460,8 +563,11 @@
 
             <!-- 分类 4 -->
             <div class="stack-category">
-                <h3 lang="zh">开发工具链</h3>
-                <h3 lang="en">Toolchain</h3>
+                <h3 class="stack-title">
+                    <svg class="icon icon-lead" aria-hidden="true"><use href="#i-gear"></use></svg>
+                    <span data-lang="zh">开发工具链</span>
+                    <span data-lang="en">Toolchain</span>
+                </h3>
                 <div class="tag-list">
                     <span class="tag">Linux</span>
                     <span class="tag">Docker</span>
@@ -475,23 +581,25 @@
     <!-- 关于我 Section -->
     <section id="about">
         <h2 class="section-title">
-            <span lang="zh">关于我</span>
-            <span lang="en">About Me</span>
+            <span data-lang="zh">关于我</span>
+            <span data-lang="en">About Me</span>
         </h2>
         <div class="about-content">
-            <p lang="zh">你好！这里是 Sam-Fic。我喜欢绘画和音乐。<strong>重型贝斯（最喜欢的音乐人是 Virtual Riot） / 金属核（最喜欢的乐队是 Wind Walkers）音乐重度爱好者</strong>，喜欢<strong>虚拟歌手</strong>技术与文化（头像是嫣汐:D），喜欢学习语言。虽然我是工科出身，但我的梦想是做 UI/UX 设计师。</p>
-            <p lang="en">Hi! Sam-Fic here. I'm into drawing and music. A huge fan of <strong>Drum & Bass (favorite artist is Virtual Riot)</strong> and <strong>metalcore (favorite band is Wind Walkers)</strong>, really passionate about <strong>Vocaloid</strong> technology and culture (my avatar is Yanxi :D), and love learning languages. Even though I studied engineering, my dream is to be a UI/UX designer.</p>
+            <p data-lang="zh">你好！这里是 Sam-Fic。我喜欢绘画和音乐。<strong>重型贝斯（最喜欢的音乐人是 Virtual Riot） / 金属核（最喜欢的乐队是 Wind Walkers）音乐重度爱好者</strong>，喜欢<strong>虚拟歌手</strong>技术与文化（头像是嫣汐:D），喜欢学习语言。虽然我是工科出身，但我的梦想是做 UI/UX 设计师。</p>
+            <p data-lang="en">Hi! Sam-Fic here. I'm into drawing and music. A huge fan of <strong>Drum & Bass (favorite artist is Virtual Riot)</strong> and <strong>metalcore (favorite band is Wind Walkers)</strong>, really passionate about <strong>Vocaloid</strong> technology and culture (my avatar is Yanxi :D), and love learning languages. Even though I studied engineering, my dream is to be a UI/UX designer.</p>
         </div>
     </section>
 
     <!-- 页脚 -->
     <footer>
-        <p>&copy; 2026 Sam-Fic. Powered by heavy bass.</p>
+        <p>
+            <span>&copy; 2026 Sam-Fic. Powered by heavy bass.</span>
+        </p>
     </footer>
 
     <!-- 图片放大预览 Lightbox -->
-    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="图片预览">
-        <button class="lightbox-close" id="lightboxClose" aria-label="关闭预览">&times;</button>
+    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="图片预览" tabindex="-1">
+        <button class="lightbox-close" id="lightboxClose" aria-label="关闭预览 / Close">&times;</button>
         <img id="lightboxImg" src="" alt="">
     </div>
 
