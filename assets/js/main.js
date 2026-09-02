@@ -189,6 +189,8 @@ if (backToTopBtn) {
     let userScale = 1;
     let userTx = 0, userTy = 0; // 滚轮缩放后拖拽平移的偏移量
     let baseRect = null; // 打开稳定后的原始全屏内容矩形（未受滚轮缩放影响）
+    let openSeq = 0;     // 打开/关闭都递增，用于作废迟到的图片 load 回调与关闭清理
+    let closing = false; // 关闭动画进行中，忽略重复的关闭触发
 
     // 应用全屏态的滚动缩放 + 拖拽平移（在打开稳定后的原始全屏态基础上）
     function applyUserTransform(transition) {
@@ -243,6 +245,8 @@ if (backToTopBtn) {
     }
 
     function openLightbox(img) {
+        closing = false; // 重新打开会打断进行中的关闭流程
+        const seq = ++openSeq;
         if (sourceImg && sourceImg !== img) {
             sourceImg.style.visibility = '';
             sourceImg = null;
@@ -271,6 +275,9 @@ if (backToTopBtn) {
         lightbox.focus({ preventScroll: true });
 
         const start = function () {
+            lightboxImg.onload = null;
+            lightboxImg.onerror = null;
+            if (seq !== openSeq) return; // 期间被关闭/重开，迟到的 load 回调直接作废
             lightbox.classList.add('open', 'active');
             const t = fitTransform(sourceRect);
             baseRect = contentRect(lightboxImg, lightboxImg.getBoundingClientRect()); // 记录原始全屏态
@@ -306,6 +313,9 @@ if (backToTopBtn) {
     }
 
     function closeLightbox() {
+        openSeq++; // 作废尚未触发的 start 回调，避免关闭后黑屏闪回
+        if (closing) return;
+        closing = true;
         if (!sourceRect) {
             lightbox.classList.remove('active', 'open');
             lightboxClose.classList.remove('show');
@@ -323,6 +333,7 @@ if (backToTopBtn) {
             userTy = 0;
             baseRect = null;
             restoreFocus();
+            closing = false;
             return;
         }
         const t = fitTransform(sourceRect, baseRect); // 以原始全屏态为基准，缩放可平滑回落
@@ -332,8 +343,13 @@ if (backToTopBtn) {
             lightboxImg.style.transition = 'transform 0.3s ' + EASING;
             lightboxImg.style.transform = t;
         }
-        // 飞回动画结束后再隐藏遮罩并清理
+        // 飞回动画结束后再隐藏遮罩并清理；期间若重新打开（openSeq 变化）则本次清理作废
+        const seq = openSeq;
         setTimeout(function () {
+            if (seq !== openSeq) return;
+            closing = false;
+            lightboxImg.onload = null;
+            lightboxImg.onerror = null;
             lightbox.classList.remove('open');
             lightboxImg.src = PLACEHOLDER;
             lightboxImg.style.transform = '';
@@ -981,4 +997,18 @@ const spotifyGroove = { playing: false, bpm: 100 };
             }, 230);
         });
     }
+
+    // Spotify iframe 在切歌 / 开始播放时内部会夺焦，浏览器随之把 iframe 滚进视野，页面跳到「关于我」。
+    // 拦截：焦点落在播放器 iframe 上且发生了滚动 → 立即归还焦点并还原滚动位置。
+    // 焦点归还后 activeElement 不再是 iframe，用户自己随后的滚动不受影响。
+    let lastScrollY = window.scrollY;
+    window.addEventListener('scroll', function () {
+        const f = HOST.querySelector('iframe');
+        if (f && document.activeElement === f) {
+            f.blur();
+            window.scrollTo(0, lastScrollY);
+        } else {
+            lastScrollY = window.scrollY;
+        }
+    }, { passive: true });
 })();
