@@ -4,6 +4,7 @@ Thumbs.db
 
 # 编辑器
 .vscode/
+.codebuddy/
 .idea/
 
 # 临时文件
