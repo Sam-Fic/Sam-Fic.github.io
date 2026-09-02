@@ -668,7 +668,9 @@ if (backToTopBtn) {
    平静态：画布完全空白，footer 与普通页面无异。
    鼠标进入后：以光标所在格为中心亮起一圈圈实心方块组成的同心方环，
    按 9Hz 整数节拍硬切换亮/灭；光标压过的格子留下短促的实心轨迹。
-   网格整体居中，边缘不会出现被裁切的半截方块。全程只有实心 #FF6600 的亮/灭两态，
+   网格整体居中，边缘不会出现被裁切的半截方块。
+   律动强度 level：点 ♪ 按钮授权捕获本标签页音频后，跟真实低频能量包络走；
+   未授权时退回合成重低音节拍。全程只有实心 #FF6600 的亮/灭两态，
    没有透明度渐变、没有缓动、没有曲线——一切硬切。 */
 (function () {
     if (prefersReducedMotion()) return;
@@ -684,6 +686,8 @@ if (backToTopBtn) {
     const R = 8;       // 影响半径（格），切比雪夫距离 → 同心方环
     // 离散透明度台阶（posterize）：档位硬跳，不做丝滑渐变
     const LEVELS = [0.20, 0.42, 0.65, 0.85];
+    const BPM = 100;             // 合成重低音节拍速度
+    const BEAT = 60 / BPM;       // 单拍时长（秒）
 
     let w = 0, h = 0, dpr = 1, cols = 0, rows = 0;
     let offX = 0, offY = 0;   // 网格整体居中偏移，保证边缘不被裁切
@@ -691,6 +695,7 @@ if (backToTopBtn) {
     let px = -100, py = -100;  // 光标像素坐标（画十字线用）
     let inside = false;
     let inView = false, running = false, raf = 0, last = 0, t = 0;
+    let analyser = null, freqData = null, audioCtx = null, audioEnv = 0; // 真实音频分析状态
     const trail = new Map();   // "i,j" -> 到期时间戳，到点瞬间熄灭
 
     // 确定性整数散列：同一格在同一节拍内状态稳定，节拍推进即硬切换
@@ -735,20 +740,41 @@ if (backToTopBtn) {
         ctx.fillStyle = '#FF6600';
 
         // 1) 同心方环：各环“被点亮”的概率按切比雪夫距离阶梯下降；
-        //    点亮的格子再按离散台阶取透明度（档位硬跳，非丝滑渐变）
+        //    点亮的格子再按离散台阶取透明度（档位硬跳，非丝滑渐变）。
+        //    整个方阵随合成重低音节拍律动：起拍最密最亮、向外扩张，随后衰减。
         if (inside && cx >= 0) {
             const k = Math.floor(t * FLICK);
-            for (let dj = -R; dj <= R; dj++) {
+            // 律动强度 level：有真实音频分析时取低频能量包络，否则退回合成底鼓
+            let level;
+            if (analyser) {
+                analyser.getByteFrequencyData(freqData);
+                let s = 0;
+                for (let b = 1; b <= 6; b++) s += freqData[b]; // 低频 bins（约 170–1030Hz）
+                const bass = (s / 6) / 255;
+                audioEnv = Math.max(bass, audioEnv * 0.86); // 快起慢落，制造重低音“砸”感
+                level = audioEnv;
+            } else {
+                const phase = (t % BEAT) / BEAT;
+                let kick = Math.exp(-phase * 6);
+                if (phase > 0.5) kick = Math.max(kick, 0.5 * Math.exp(-(phase - 0.5) * 6));
+                level = kick;
+            }
+            const rEff = R + Math.round(level * 3); // 起拍/重拍时方阵向外扩张
+            for (let dj = -rEff; dj <= rEff; dj++) {
                 const j = cy + dj;
                 if (j < 0 || j >= rows) continue;
-                for (let di = -R; di <= R; di++) {
+                for (let di = -rEff; di <= rEff; di++) {
                     const i = cx + di;
                     if (i < 0 || i >= cols) continue;
                     const d = Math.max(Math.abs(di), Math.abs(dj));
-                    const thr = d <= 2 ? 0.95 : d <= 4 ? 0.60 : d <= 6 ? 0.32 : 0.12;
+                    // 密度随律动起伏
+                    const base = d <= 2 ? 0.95 : d <= 4 ? 0.60 : d <= 6 ? 0.32 : 0.12;
+                    const thr = base * (0.2 + 0.8 * level);
                     const v = hash(i, j, k);
                     if (v < thr) {
-                        const lv = LEVELS[Math.floor(hash(i, j, k + 1) * LEVELS.length)];
+                        // 亮度随律动起伏（档位硬跳，非丝滑渐变）
+                        const idx = Math.floor(hash(i, j, k + 1) * LEVELS.length);
+                        const lv = Math.min(1, LEVELS[idx] * (0.4 + 0.7 * level));
                         ctx.fillStyle = 'rgba(255, 102, 0, ' + lv + ')';
                         cellRect(i, j);
                     }
@@ -795,6 +821,77 @@ if (backToTopBtn) {
         inside = false;
         footer.classList.remove('hot');
     });
+
+    // 标签页音频捕获（getDisplayMedia + audio）：把当前标签页正在播放的声音
+    // （含跨域的 Spotify iframe）作为真实音源交给 AnalyserNode 分析。
+    // 注意：Chrome 不支持“纯音频”的屏幕捕获，必须同时请求 video + audio，
+    // 否则直接抛 AbortError（这正是 ♪ 按钮之前点了没反应的原因）；
+    // 拿到流后视频轨不用即可。需在共享弹窗选「此标签页」并勾选「共享标签页音频」。
+    const audioBtn = document.getElementById('audioReact');
+    const audioHint = document.getElementById('audioHint');
+    let hintTimer = 0;
+
+    function showAudioHint() {
+        if (!audioHint) return;
+        audioHint.hidden = false;
+        clearTimeout(hintTimer);
+        hintTimer = setTimeout(function () { audioHint.hidden = true; }, 6000);
+    }
+
+    function setAnalyser(stream) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const srcNode = audioCtx.createMediaStreamSource(stream);
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 256;            // 128 个频点
+        analyser.smoothingTimeConstant = 0.6;
+        freqData = new Uint8Array(analyser.frequencyBinCount);
+        srcNode.connect(analyser); // 不连 destination，避免回放/回声
+        audioBtn && audioBtn.classList.add('on');
+        const track = stream.getAudioTracks()[0];
+        if (track) track.onended = disableAudioReactive; // 用户停止共享 → 退回合成节拍
+    }
+
+    function disableAudioReactive() {
+        analyser = null;
+        audioBtn && audioBtn.classList.remove('on');
+        if (audioCtx) { audioCtx.close(); audioCtx = null; }
+        if (currentStream) {
+            currentStream.getTracks().forEach(function (t) { t.stop(); });
+            currentStream = null;
+        }
+    }
+
+    let currentStream = null;
+    async function enableAudioReactive() {
+        if (analyser) { disableAudioReactive(); return; } // 再次点击 = 停止捕获
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+            audioBtn && audioBtn.classList.add('disabled');
+            showAudioHint();
+            return;
+        }
+        try {
+            // video + audio 一起请求（纯音频会被 Chrome 拒绝），视频轨仅占位不使用
+            const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+            if (!stream.getAudioTracks().length) {
+                // 用户没勾选「共享标签页音频」→ 提示后重试
+                stream.getTracks().forEach(function (t) { t.stop(); });
+                showAudioHint();
+                return;
+            }
+            currentStream = stream;
+            setAnalyser(stream);
+        } catch (e) {
+            // 用户取消 / 浏览器不支持音频捕获：保持合成节拍并给出提示
+            showAudioHint();
+        }
+    }
+    if (audioBtn) {
+        audioBtn.addEventListener('click', function (e) {
+            e.stopPropagation(); // 避免触发 footer 的鼠标联动
+            enableAudioReactive();
+        });
+    }
 
     window.addEventListener('resize', build);
 

@@ -565,7 +565,7 @@ section {
     margin: 0 auto;
     background-color: transparent;
     border: none;
-    padding: 1.25rem;
+    padding: 0.85rem;
     transition: transform 0.2s var(--ease);
 }
 .spotify-embed::before {
@@ -941,6 +941,55 @@ footer p {
 }
 /* 悬停态不改动任何颜色，仅作为 JS 标记（驱动画布动效）使用 */
 footer.hot {
+}
+
+/* 音频律动触发按钮：安静时低调，悬停/启用时转主色；直角、无圆角 */
+.audio-react {
+    position: absolute;
+    right: 0.6rem;
+    bottom: 0.6rem;
+    z-index: 2;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    background-color: var(--bg);
+    color: var(--text-secondary);
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.35;
+}
+.audio-react:hover,
+footer:hover .audio-react,
+.audio-react.on {
+    opacity: 1;
+    color: var(--primary);
+    border-color: var(--primary);
+}
+.audio-react.disabled {
+    opacity: 0.15;
+    cursor: not-allowed;
+}
+
+/* 音频捕获失败 / 不支持时的操作提示，出现在版权文字上方 */
+.audio-hint {
+    position: relative;
+    z-index: 2;
+    display: inline-block;
+    margin-bottom: 1rem;
+    padding: 0.5rem 0.9rem;
+    border: 1px solid var(--primary);
+    background-color: var(--bg);
+    color: var(--primary);
+    font-size: 0.8rem;
+    text-align: center;
+    pointer-events: none;
+}
+.audio-hint[hidden] {
+    display: none;
 }
 
 .hamburger {

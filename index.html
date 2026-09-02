@@ -614,6 +614,11 @@
     <footer>
         <!-- 重低音均衡器画布：平时几乎不可见，鼠标进入后被“点亮” -->
         <canvas id="footerFx" aria-hidden="true"></canvas>
+        <button id="audioReact" class="audio-react" type="button" aria-label="启用音频律动" title="点击捕获本标签页音频（Chrome/Edge 桌面版，https 或 localhost）">&#9834;</button>
+        <p class="audio-hint" id="audioHint" hidden>
+            <span data-lang="zh">请选择「此标签页」并勾选「共享标签页音频」（需 Chrome / Edge 桌面版 + https）</span>
+            <span data-lang="en">Pick "This tab" and tick "Share tab audio" (Chrome / Edge desktop, https required)</span>
+        </p>
         <p>
             <span>&copy; 2026 Sam-Fic. Powered by heavy bass.</span>
         </p>
