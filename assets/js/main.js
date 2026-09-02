@@ -604,6 +604,11 @@ const spotifyGroove = { playing: false, bpm: 100 };
     let grooveMix = 0;   // 律动强度 0~1，播放/暂停间平滑过渡
     let groovePhase = 0; // 节拍相位（秒）
 
+    // 鼠标回避：粒子在光标附近只做水平让位，垂直上浮速度不受影响
+    const DODGE_R = 110; // 影响半径（px）
+    const DODGE_V = 240; // 最大回避速度（px/s）
+    const pointer = { x: -9999, y: -9999, active: false };
+
     function spawn(initial) {
         const size = 4 + Math.random() * 12; // 4~16px 大小不一的方框，呼应纯直角
         return {
@@ -649,6 +654,15 @@ const spotifyGroove = { playing: false, bpm: 100 };
             p.y -= p.vy * (1 + 1.1 * grooveMix) * dt; // 播放时上浮加速
             p.phase += dt;
             p.x += (p.vx * (1 + grooveMix) + Math.sin(p.phase) * p.sway * 0.3) * dt;
+            // 水平回避：方向沿 (dx/(|dx|+软化项)) 平滑过渡，光标正上方时不抖动
+            if (pointer.active) {
+                const dx = p.x - pointer.x;
+                const dy = p.y - pointer.y;
+                const d = Math.sqrt(dx * dx + dy * dy);
+                if (d < DODGE_R) {
+                    p.x += (dx / (Math.abs(dx) + 24)) * (1 - d / DODGE_R) * DODGE_V * dt;
+                }
+            }
             if (p.y < -p.s) Object.assign(p, spawn(false));
             if (p.x < -p.s) p.x = w + p.s;
             else if (p.x > w + p.s) p.x = -p.s;
@@ -662,6 +676,11 @@ const spotifyGroove = { playing: false, bpm: 100 };
     }
     build();
     raf = requestAnimationFrame(frame);
+    window.addEventListener('pointermove', function (e) {
+        pointer.x = e.clientX;
+        pointer.y = e.clientY;
+        pointer.active = true;
+    }, { passive: true });
     window.addEventListener('resize', function () {
         cancelAnimationFrame(raf);
         build();
