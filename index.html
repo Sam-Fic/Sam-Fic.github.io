@@ -105,7 +105,7 @@
         <symbol id="i-gitee" viewBox="0 0 24 24"><path d="M11.984 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.016 0zm6.09 5.333c.328 0 .593.266.592.593v1.482a.594.594 0 0 1-.593.592H9.777c-.982 0-1.778.796-1.778 1.778v5.63c0 .327.266.592.593.592h5.63c.982 0 1.778-.796 1.778-1.778v-.296a.593.593 0 0 0-.592-.593h-4.15a.592.592 0 0 1-.592-.592v-1.482a.593.593 0 0 1 .593-.592h6.815c.327 0 .593.265.593.592v3.408a4 4 0 0 1-4 4H5.926a.593.593 0 0 1-.593-.593V9.778a4.444 4.444 0 0 1 4.445-4.444h8.296Z"/></symbol>
     </svg>
 
-    <!-- 背景粒子动效画布（纯氛围，不拦截交互） -->
+    <!-- 背景粒子动效画布（Spotify 播放时按节拍伪律动，不拦截交互） -->
     <canvas id="bgParticles" aria-hidden="true"></canvas>
 
     <!-- 导航栏 -->
@@ -596,15 +596,9 @@
                 <!-- 把下面 iframe 的 playlist/ 之后那段 ID 换成你自己的歌单 ID
                      （打开歌单页，URL 形如 open.spotify.com/playlist/XXXXXXXX，取 XXXXXXXX） -->
                 <div class="spotify-embed reveal">
-                    <iframe
-                        id="spotifyPlayer"
-                        title="Sam-Fic 的 Spotify 歌单"
-                        width="100%" height="352"
-                        frameborder="0"
-                        loading="lazy"
-                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                        src="https://open.spotify.com/embed/playlist/7EMV7PM2opruGcHFrrNWtf?utm_source=generator">
-                    </iframe>
+                    <!-- Spotify IFrame API 会把下面的占位元素替换成真正的播放器 iframe
+                         （换歌单改 main.js 里 PLAYLIST_ID 一处即可；API 不可用时自动回退静态 iframe） -->
+                    <div id="spotifyPlayer" aria-label="Sam-Fic 的 Spotify 歌单"></div>
                 </div>
             </div>
         </div>
@@ -612,13 +606,8 @@
 
     <!-- 页脚 -->
     <footer>
-        <!-- 重低音均衡器画布：平时几乎不可见，鼠标进入后被“点亮” -->
+        <!-- 几何脉冲矩阵画布：平时完全空白，鼠标进入后硬切点亮小方块（纯装饰，无音频） -->
         <canvas id="footerFx" aria-hidden="true"></canvas>
-        <button id="audioReact" class="audio-react" type="button" aria-label="启用音频律动" title="点击捕获本标签页音频（Chrome/Edge 桌面版，https 或 localhost）">&#9834;</button>
-        <p class="audio-hint" id="audioHint" hidden>
-            <span data-lang="zh">请选择「此标签页」并勾选「共享标签页音频」（需 Chrome / Edge 桌面版 + https）</span>
-            <span data-lang="en">Pick "This tab" and tick "Share tab audio" (Chrome / Edge desktop, https required)</span>
-        </p>
         <p>
             <span>&copy; 2026 Sam-Fic. Powered by heavy bass.</span>
         </p>
@@ -640,5 +629,8 @@
 
     <!-- 功能控制 JavaScript -->
     <script src="assets/js/main.js"></script>
+    <!-- Spotify IFrame API：提供播放/暂停事件驱动背景粒子伪律动（须在 main.js 之后加载，
+         main.js 会先定义 onSpotifyIframeApiReady 钩子；脚本不可达时 main.js 自动回退静态 iframe） -->
+    <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
 </body>
 </html>

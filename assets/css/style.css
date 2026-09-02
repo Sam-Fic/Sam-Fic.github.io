@@ -433,6 +433,7 @@ section {
     align-items: center;
     padding: 0.75rem 1.5rem;
     border: 3px solid var(--text);
+    background-color: var(--card-bg);
     color: var(--text);
     font-weight: 600;
     position: relative;
@@ -601,6 +602,7 @@ section {
 .spotify-embed iframe {
     display: block;
     width: 100%;
+    height: 352px; /* IFrame API 生成的 iframe 以此为准；静态回退 iframe 同样适用 */
     border: 0;
 }
 
@@ -919,7 +921,6 @@ footer {
     background-color: var(--bg); /* 实底盖住底层粒子画布，粒子不进入 footer */
     position: relative;
     z-index: 1;
-    overflow: hidden; /* 裁切均衡器画布 / 火花溢出 */
 }
 
 /* Footer 几何脉冲矩阵：JS 驱动画布，平时完全空白，鼠标进入后硬切点亮 */
@@ -931,65 +932,15 @@ footer {
     pointer-events: none;
     z-index: 0;
 }
+/* 悬停态不改动任何颜色，仅作为 JS 标记（驱动画布动效）使用 */
+footer.hot {
+}
 footer p {
     position: relative;
     z-index: 1;
     display: inline-block;
-    background-color: var(--bg); /* 常驻地板块，盖住其下方的橙色小方块 */
     padding: 0.6em; /* 相对文字字号，四周等距留白 */
     line-height: 1; /* 收住行高，使上下留白与左右视觉一致 */
-}
-/* 悬停态不改动任何颜色，仅作为 JS 标记（驱动画布动效）使用 */
-footer.hot {
-}
-
-/* 音频律动触发按钮：安静时低调，悬停/启用时转主色；直角、无圆角 */
-.audio-react {
-    position: absolute;
-    right: 0.6rem;
-    bottom: 0.6rem;
-    z-index: 2;
-    width: 2rem;
-    height: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--border);
-    background-color: var(--bg);
-    color: var(--text-secondary);
-    font-size: 1rem;
-    line-height: 1;
-    cursor: pointer;
-    opacity: 0.35;
-}
-.audio-react:hover,
-footer:hover .audio-react,
-.audio-react.on {
-    opacity: 1;
-    color: var(--primary);
-    border-color: var(--primary);
-}
-.audio-react.disabled {
-    opacity: 0.15;
-    cursor: not-allowed;
-}
-
-/* 音频捕获失败 / 不支持时的操作提示，出现在版权文字上方 */
-.audio-hint {
-    position: relative;
-    z-index: 2;
-    display: inline-block;
-    margin-bottom: 1rem;
-    padding: 0.5rem 0.9rem;
-    border: 1px solid var(--primary);
-    background-color: var(--bg);
-    color: var(--primary);
-    font-size: 0.8rem;
-    text-align: center;
-    pointer-events: none;
-}
-.audio-hint[hidden] {
-    display: none;
 }
 
 .hamburger {
@@ -1220,7 +1171,7 @@ footer:hover .audio-react,
     .theme-wipe {
         display: none;
     }
-    /* 减少动态时关闭新增动效：背景粒子画布、footer 几何矩阵画布隐藏 */
+    /* 减少动态时关闭背景粒子画布与 footer 几何矩阵画布 */
     #bgParticles,
     #footerFx {
         display: none;

@@ -587,7 +587,10 @@ if (backToTopBtn) {
     sectionToLink.forEach(function (_link, section) { io.observe(section); });
 })();
 
-/* ===== 背景粒子流（大小不一的橙色方框描边，纯氛围） ===== */
+/* Spotify 播放状态广播：播放器模块写入，背景粒子模块读取（伪律动共享状态） */
+const spotifyGroove = { playing: false, bpm: 100 };
+
+/* ===== 背景粒子流（大小不一的橙色方框描边；Spotify 播放时按节拍伪律动） ===== */
 (function () {
     if (prefersReducedMotion()) return; // 尊重“减少动态效果”
     const canvas = document.getElementById('bgParticles');
@@ -596,6 +599,10 @@ if (backToTopBtn) {
     if (!ctx) return;
 
     let w = 0, h = 0, dpr = 1, particles = [];
+
+    // 伪律动：跨域 + DRM 决定拿不到 Spotify 真实音频频谱，用播放状态 + 合成节拍模拟
+    let grooveMix = 0;   // 律动强度 0~1，播放/暂停间平滑过渡
+    let groovePhase = 0; // 节拍相位（秒）
 
     function spawn(initial) {
         const size = 4 + Math.random() * 12; // 4~16px 大小不一的方框，呼应纯直角
@@ -631,16 +638,25 @@ if (backToTopBtn) {
         last = t;
         if (dt > 0.05) dt = 0.05; // 卡顿 / 切回标签页时兜底
         ctx.clearRect(0, 0, w, h);
+
+        // 节拍律动：每拍起跳后指数衰减，模拟重低音的“砸拍”感；暂停时平滑归零
+        groovePhase += dt;
+        grooveMix += ((spotifyGroove.playing ? 1 : 0) - grooveMix) * Math.min(1, dt * 4);
+        const beatT = (groovePhase * spotifyGroove.bpm / 60) % 1;
+        const boost = grooveMix * Math.exp(-5 * beatT);
+
         for (const p of particles) {
-            p.y -= p.vy * dt;
+            p.y -= p.vy * (1 + 1.1 * grooveMix) * dt; // 播放时上浮加速
             p.phase += dt;
-            p.x += (p.vx + Math.sin(p.phase) * p.sway * 0.3) * dt;
+            p.x += (p.vx * (1 + grooveMix) + Math.sin(p.phase) * p.sway * 0.3) * dt;
             if (p.y < -p.s) Object.assign(p, spawn(false));
             if (p.x < -p.s) p.x = w + p.s;
             else if (p.x > w + p.s) p.x = -p.s;
-            ctx.strokeStyle = 'rgba(255,102,0,' + p.a + ')';
+            const s = p.s * (1 + 0.22 * boost); // 拍点上轻微放大
+            const off = (p.s - s) / 2;          // 以中心为锚点放大（抵消 strokeRect 左上角起画）
+            ctx.strokeStyle = 'rgba(255,102,0,' + Math.min(0.55, p.a * (1 + 2.2 * boost)).toFixed(3) + ')';
             ctx.lineWidth = 3; // 线宽统一 3px
-            ctx.strokeRect(p.x, p.y, p.s, p.s); // 方框描边（非实心）
+            ctx.strokeRect(p.x + off, p.y + off, s, s); // 方框描边（非实心）
         }
         raf = requestAnimationFrame(frame);
     }
@@ -664,14 +680,12 @@ if (backToTopBtn) {
     });
 })();
 
-/* ===== Footer 几何脉冲矩阵（鼠标联动） =====
+/* ===== Footer 几何脉冲矩阵（鼠标联动，纯装饰，无音频捕获） =====
    平静态：画布完全空白，footer 与普通页面无异。
    鼠标进入后：以光标所在格为中心亮起一圈圈实心方块组成的同心方环，
    按 9Hz 整数节拍硬切换亮/灭；光标压过的格子留下短促的实心轨迹。
    网格整体居中，边缘不会出现被裁切的半截方块。
-   律动强度 level：点 ♪ 按钮授权捕获本标签页音频后，跟真实低频能量包络走；
-   未授权时退回合成重低音节拍。全程只有实心 #FF6600 的亮/灭两态，
-   没有透明度渐变、没有缓动、没有曲线——一切硬切。 */
+   律动由内置合成重低音节拍驱动，不依赖任何音频捕获（应需求移除 ♪ 捕获）。 */
 (function () {
     if (prefersReducedMotion()) return;
     const footer = document.querySelector('footer');
@@ -682,6 +696,7 @@ if (backToTopBtn) {
 
     const CELL = 20;   // 网格步长（px）
     const INSET = 4;   // 方块相对格子的内缩，形成正交缝隙
+    const MARGIN = 8;  // 文字遮挡区外扩留白，避免方块紧贴文字
     const FLICK = 9;   // 闪烁节拍（Hz），状态整帧硬切换
     const R = 8;       // 影响半径（格），切比雪夫距离 → 同心方环
     // 离散透明度台阶（posterize）：档位硬跳，不做丝滑渐变
@@ -695,8 +710,25 @@ if (backToTopBtn) {
     let px = -100, py = -100;  // 光标像素坐标（画十字线用）
     let inside = false;
     let inView = false, running = false, raf = 0, last = 0, t = 0;
-    let analyser = null, freqData = null, audioCtx = null, audioEnv = 0; // 真实音频分析状态
     const trail = new Map();   // "i,j" -> 到期时间戳，到点瞬间熄灭
+    const textEl = footer.querySelector('p'); // 版权文字，画布在其区域留白
+    let maskRect = null;                      // 文字区域（画布坐标），方块避让
+
+    // 用 Range 量取文字内容的紧致包围盒（贴着字形，而非整行 line-box），
+    // 避免 p 的 line-height/基线导致遮罩在文字下方留白偏多；每帧重算以适配语言切换导致的宽度变化。
+    function computeMask() {
+        if (!textEl) { maskRect = null; return; }
+        const fr = footer.getBoundingClientRect();
+        const range = document.createRange();
+        range.selectNodeContents(textEl);
+        const tr = range.getBoundingClientRect();
+        maskRect = {
+            x: tr.left - fr.left - MARGIN,
+            y: tr.top - fr.top - MARGIN,
+            w: tr.width + MARGIN * 2,
+            h: tr.height + MARGIN * 2
+        };
+    }
 
     // 确定性整数散列：同一格在同一节拍内状态稳定，节拍推进即硬切换
     function hash(x, y, k) {
@@ -724,7 +756,15 @@ if (backToTopBtn) {
     }
 
     function cellRect(i, j) {
-        ctx.fillRect(offX + i * CELL + INSET, offY + j * CELL + INSET, CELL - INSET * 2, CELL - INSET * 2);
+        const x = offX + i * CELL + INSET;
+        const y = offY + j * CELL + INSET;
+        const s = CELL - INSET * 2;
+        if (maskRect &&
+            x < maskRect.x + maskRect.w && x + s > maskRect.x &&
+            y < maskRect.y + maskRect.h && y + s > maskRect.y) {
+            return; // 落在版权文字区域，留白不画
+        }
+        ctx.fillRect(x, y, s, s);
     }
 
     function frame(now) {
@@ -735,30 +775,20 @@ if (backToTopBtn) {
         last = now;
         if (dt > 0.05) dt = 0.05; // 卡顿 / 切回标签页时兜底
         t += dt;
+        computeMask(); // 每帧更新文字遮挡区（适配语言切换后的宽度）
 
         ctx.clearRect(0, 0, w, h);
         ctx.fillStyle = '#FF6600';
 
-        // 1) 同心方环：各环“被点亮”的概率按切比雪夫距离阶梯下降；
-        //    点亮的格子再按离散台阶取透明度（档位硬跳，非丝滑渐变）。
-        //    整个方阵随合成重低音节拍律动：起拍最密最亮、向外扩张，随后衰减。
+        // 同心方环：各环"被点亮"的概率按切比雪夫距离阶梯下降；
+        // 点亮的格子再按离散台阶取透明度（档位硬跳，非丝滑渐变）。
+        // 整个方阵随内置合成重低音节拍律动：起拍最密最亮、向外扩张，随后衰减。
         if (inside && cx >= 0) {
             const k = Math.floor(t * FLICK);
-            // 律动强度 level：有真实音频分析时取低频能量包络，否则退回合成底鼓
-            let level;
-            if (analyser) {
-                analyser.getByteFrequencyData(freqData);
-                let s = 0;
-                for (let b = 1; b <= 6; b++) s += freqData[b]; // 低频 bins（约 170–1030Hz）
-                const bass = (s / 6) / 255;
-                audioEnv = Math.max(bass, audioEnv * 0.86); // 快起慢落，制造重低音“砸”感
-                level = audioEnv;
-            } else {
-                const phase = (t % BEAT) / BEAT;
-                let kick = Math.exp(-phase * 6);
-                if (phase > 0.5) kick = Math.max(kick, 0.5 * Math.exp(-(phase - 0.5) * 6));
-                level = kick;
-            }
+            const phase = (t % BEAT) / BEAT;
+            let kick = Math.exp(-phase * 6);
+            if (phase > 0.5) kick = Math.max(kick, 0.5 * Math.exp(-(phase - 0.5) * 6));
+            const level = kick;
             const rEff = R + Math.round(level * 3); // 起拍/重拍时方阵向外扩张
             for (let dj = -rEff; dj <= rEff; dj++) {
                 const j = cy + dj;
@@ -782,7 +812,7 @@ if (backToTopBtn) {
             }
         }
 
-        // 2) 移动轨迹：光标压过的格子亮起（实心满不透明），随机时长后瞬间熄灭（不渐隐）
+        // 移动轨迹：光标压过的格子亮起（实心满不透明），随机时长后瞬间熄灭（不渐隐）
         ctx.fillStyle = '#FF6600';
         for (const [key, expire] of trail) {
             if (now >= expire) { trail.delete(key); continue; }
@@ -822,77 +852,6 @@ if (backToTopBtn) {
         footer.classList.remove('hot');
     });
 
-    // 标签页音频捕获（getDisplayMedia + audio）：把当前标签页正在播放的声音
-    // （含跨域的 Spotify iframe）作为真实音源交给 AnalyserNode 分析。
-    // 注意：Chrome 不支持“纯音频”的屏幕捕获，必须同时请求 video + audio，
-    // 否则直接抛 AbortError（这正是 ♪ 按钮之前点了没反应的原因）；
-    // 拿到流后视频轨不用即可。需在共享弹窗选「此标签页」并勾选「共享标签页音频」。
-    const audioBtn = document.getElementById('audioReact');
-    const audioHint = document.getElementById('audioHint');
-    let hintTimer = 0;
-
-    function showAudioHint() {
-        if (!audioHint) return;
-        audioHint.hidden = false;
-        clearTimeout(hintTimer);
-        hintTimer = setTimeout(function () { audioHint.hidden = true; }, 6000);
-    }
-
-    function setAnalyser(stream) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const srcNode = audioCtx.createMediaStreamSource(stream);
-        analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 256;            // 128 个频点
-        analyser.smoothingTimeConstant = 0.6;
-        freqData = new Uint8Array(analyser.frequencyBinCount);
-        srcNode.connect(analyser); // 不连 destination，避免回放/回声
-        audioBtn && audioBtn.classList.add('on');
-        const track = stream.getAudioTracks()[0];
-        if (track) track.onended = disableAudioReactive; // 用户停止共享 → 退回合成节拍
-    }
-
-    function disableAudioReactive() {
-        analyser = null;
-        audioBtn && audioBtn.classList.remove('on');
-        if (audioCtx) { audioCtx.close(); audioCtx = null; }
-        if (currentStream) {
-            currentStream.getTracks().forEach(function (t) { t.stop(); });
-            currentStream = null;
-        }
-    }
-
-    let currentStream = null;
-    async function enableAudioReactive() {
-        if (analyser) { disableAudioReactive(); return; } // 再次点击 = 停止捕获
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
-            audioBtn && audioBtn.classList.add('disabled');
-            showAudioHint();
-            return;
-        }
-        try {
-            // video + audio 一起请求（纯音频会被 Chrome 拒绝），视频轨仅占位不使用
-            const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
-            if (!stream.getAudioTracks().length) {
-                // 用户没勾选「共享标签页音频」→ 提示后重试
-                stream.getTracks().forEach(function (t) { t.stop(); });
-                showAudioHint();
-                return;
-            }
-            currentStream = stream;
-            setAnalyser(stream);
-        } catch (e) {
-            // 用户取消 / 浏览器不支持音频捕获：保持合成节拍并给出提示
-            showAudioHint();
-        }
-    }
-    if (audioBtn) {
-        audioBtn.addEventListener('click', function (e) {
-            e.stopPropagation(); // 避免触发 footer 的鼠标联动
-            enableAudioReactive();
-        });
-    }
-
     window.addEventListener('resize', build);
 
     // 只在 footer 进入视口时渲染
@@ -922,27 +881,85 @@ if (backToTopBtn) {
     build();
 })();
 
-/* ===== Spotify 播放器：主题跟随站点明暗 =====
-   Embed 自身不自动适配页面主题，故按当前主题改写 iframe 的 theme 参数。
-   注意：改写 src 会重载播放器，因此切主题时正在播放的音乐会重新开始。 */
+/* ===== Spotify 播放器：IFrame API 接管 + 主题跟随 + 播放状态广播 =====
+   用官方 IFrame API 创建播放器以拿到 playback_update 事件（isPaused），
+   写入 spotifyGroove 驱动背景粒子伪律动（跨域 + DRM 拿不到真实音频频谱）。
+   Embed options 官方只支持 uri/url/width/height，theme 参数靠 URL 查询串透传（尽力而为），
+   主题切换通过整卡重建实现（与旧方案一样音乐重新开始）。
+   API 脚本加载失败（如网络不通）时自动回退静态 iframe，播放器始终可用。 */
 (function () {
-    const player = document.getElementById('spotifyPlayer');
-    if (!player) return;
+    const HOST = document.querySelector('.spotify-embed');
+    if (!HOST) return;
 
-    // 歌单 ID 与基础地址（换歌单只需改这一处）
-    const EMBED_BASE = 'https://open.spotify.com/embed/playlist/7EMV7PM2opruGcHFrrNWtf?utm_source=generator';
+    // 换歌单只需改这一处（歌单页 URL open.spotify.com/playlist/XXXXXXXX 里的 XXXXXXXX）
+    const PLAYLIST_ID = '7EMV7PM2opruGcHFrrNWtf';
+    const CONTENT_URL = 'https://open.spotify.com/playlist/' + PLAYLIST_ID;
+    const EMBED_BASE = 'https://open.spotify.com/embed/playlist/' + PLAYLIST_ID + '?utm_source=generator';
 
-    function applySpotifyTheme() {
+    let api = null;            // IFrameAPI 引用（onSpotifyIframeApiReady 时赋值）
+    let built = false;         // 播放器是否已创建（API 版或回退版）
+    let usingFallback = false; // 是否已回退为静态 iframe
+
+    function embedSrc() {
         // 亮色模式追加 theme=0（白底）；暗色用默认（黑底），故不追加参数
-        player.src = isDark() ? EMBED_BASE : EMBED_BASE + '&theme=0';
+        return isDark() ? EMBED_BASE : EMBED_BASE + '&theme=0';
     }
 
-    applySpotifyTheme();
+    function fallbackHtml() {
+        return '<iframe title="Sam-Fic 的 Spotify 歌单" width="100%" height="352" frameborder="0" ' +
+            'loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" ' +
+            'src="' + embedSrc() + '"></iframe>';
+    }
+
+    function attachController(ctrl) {
+        const add = ctrl.addListener || ctrl.addEventListener;
+        if (add) {
+            add.call(ctrl, 'playback_update', function (e) {
+                spotifyGroove.playing = !!(e && e.data && e.data.isPaused === false);
+            });
+        }
+    }
+
+    function build() {
+        built = true;
+        spotifyGroove.playing = false; // 旧控制器随重建销毁，先复位律动状态
+        HOST.querySelectorAll('iframe, #spotifyPlayer').forEach(function (n) { n.remove(); });
+        const el = document.createElement('div');
+        el.id = 'spotifyPlayer';
+        HOST.appendChild(el);
+        if (api) {
+            // URL 查询参数随 options.url 透传给 Embed，主题借此生效（不透传则退化为暗色）
+            api.createController(el, {
+                url: CONTENT_URL + '?utm_source=generator' + (isDark() ? '' : '&theme=0'),
+                width: '100%',
+                height: 352
+            }, attachController);
+        } else {
+            usingFallback = true;
+            el.outerHTML = fallbackHtml();
+        }
+    }
+
+    // 给 API 脚本 2.5s 窗口，超时则回退静态 iframe（期间卡片短暂空白，属可接受代价）
+    const graceTimer = setTimeout(function () { if (!built) build(); }, 2500);
+    window.onSpotifyIframeApiReady = function (IFrameAPI) {
+        clearTimeout(graceTimer);
+        api = IFrameAPI;
+        if (!built) build();
+    };
 
     if (themeToggle) {
         // 主题切换在擦除动画 50% 处（约 210ms）真正生效，这里稍后同步
         themeToggle.addEventListener('click', function () {
-            setTimeout(applySpotifyTheme, 230);
+            setTimeout(function () {
+                if (!built) return;
+                if (usingFallback) {
+                    const f = HOST.querySelector('iframe');
+                    if (f) f.src = embedSrc();
+                } else {
+                    build(); // 重建控制器以套用新主题（音乐会重新开始）
+                }
+            }, 230);
         });
     }
 })();
