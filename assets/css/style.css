@@ -168,6 +168,7 @@ header {
     isolation: isolate; /* 隔离层叠上下文，保证下划线的负层级不会被祖先背景吞掉 */
     text-decoration: none;
     padding-bottom: 6px;
+    transition: color 0.25s ease;
 }
 
 /* 当前所在章节：下划线常驻 */
@@ -188,6 +189,9 @@ header {
     clip-path: inset(0 100% 0 0);
     transition: clip-path 0.35s ease;
     z-index: -1;
+}
+.nav-links a:hover {
+    color: var(--primary);
 }
 .nav-links a:hover::after {
     clip-path: inset(0 0 0 0);
@@ -853,6 +857,9 @@ footer {
     font-size: 0.9rem;
     color: var(--text-secondary);
     border-top: 3px solid var(--border);
+    background-color: var(--bg); /* 实底盖住底层粒子画布，粒子不进入 footer */
+    position: relative;
+    z-index: 1;
 }
 
 .hamburger {
@@ -1083,4 +1090,18 @@ footer {
     .theme-wipe {
         display: none;
     }
+    /* 减少动态时关闭新增动效：背景粒子画布隐藏 */
+    #bgParticles {
+        display: none;
+    }
+}
+
+/* 背景粒子画布：固定在最底层，不拦截交互，仅作氛围 */
+#bgParticles {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
 }

@@ -586,3 +586,80 @@ if (backToTopBtn) {
 
     sectionToLink.forEach(function (_link, section) { io.observe(section); });
 })();
+
+/* ===== 背景粒子流（大小不一的橙色方框描边，纯氛围） ===== */
+(function () {
+    if (prefersReducedMotion()) return; // 尊重“减少动态效果”
+    const canvas = document.getElementById('bgParticles');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let w = 0, h = 0, dpr = 1, particles = [];
+
+    function spawn(initial) {
+        const size = 4 + Math.random() * 12; // 4~16px 大小不一的方框，呼应纯直角
+        return {
+            x: Math.random() * w,
+            y: initial ? Math.random() * h : h + size,
+            s: size,
+            vy: 6 + Math.random() * 14,        // 每秒上移像素
+            vx: (Math.random() - 0.5) * 6,
+            a: 0.08 + Math.random() * 0.12,    // 低透明度，保持克制
+            phase: Math.random() * Math.PI * 2,
+            sway: 4 + Math.random() * 8
+        };
+    }
+    function build() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        w = window.innerWidth;
+        h = window.innerHeight;
+        canvas.width = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+        canvas.style.width = w + 'px';
+        canvas.style.height = h + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const count = Math.max(18, Math.min(60, Math.round(w * h / 26000)));
+        particles = [];
+        for (let i = 0; i < count; i++) particles.push(spawn(true));
+    }
+    let last = 0, raf = 0, running = true;
+    function frame(t) {
+        if (!running) return;
+        if (!last) last = t;
+        let dt = (t - last) / 1000;
+        last = t;
+        if (dt > 0.05) dt = 0.05; // 卡顿 / 切回标签页时兜底
+        ctx.clearRect(0, 0, w, h);
+        for (const p of particles) {
+            p.y -= p.vy * dt;
+            p.phase += dt;
+            p.x += (p.vx + Math.sin(p.phase) * p.sway * 0.3) * dt;
+            if (p.y < -p.s) Object.assign(p, spawn(false));
+            if (p.x < -p.s) p.x = w + p.s;
+            else if (p.x > w + p.s) p.x = -p.s;
+            ctx.strokeStyle = 'rgba(255,102,0,' + p.a + ')';
+            ctx.lineWidth = 3; // 线宽统一 3px
+            ctx.strokeRect(p.x, p.y, p.s, p.s); // 方框描边（非实心）
+        }
+        raf = requestAnimationFrame(frame);
+    }
+    build();
+    raf = requestAnimationFrame(frame);
+    window.addEventListener('resize', function () {
+        cancelAnimationFrame(raf);
+        build();
+        raf = requestAnimationFrame(frame);
+    });
+    // 标签页隐藏时暂停渲染，省电
+    document.addEventListener('visibilitychange', function () {
+        if (document.hidden) {
+            running = false;
+            cancelAnimationFrame(raf);
+        } else if (!running) {
+            running = true;
+            last = 0;
+            raf = requestAnimationFrame(frame);
+        }
+    });
+})();
