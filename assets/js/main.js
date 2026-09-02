@@ -180,6 +180,8 @@ if (backToTopBtn) {
     if (!lightbox || !lightboxImg || !lightboxClose) return;
 
     const EASING = 'cubic-bezier(0.22, 1, 0.36, 1)';
+    // 透明占位图：避免 <img src=""> 被解析成当前页面 URL 而误加载 index.html
+    const PLACEHOLDER = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
     let sourceRect = null;
     let sourceImg = null;
     let sourceCard = null;
@@ -333,7 +335,7 @@ if (backToTopBtn) {
         // 飞回动画结束后再隐藏遮罩并清理
         setTimeout(function () {
             lightbox.classList.remove('open');
-            lightboxImg.src = '';
+            lightboxImg.src = PLACEHOLDER;
             lightboxImg.style.transform = '';
             lightboxImg.style.objectFit = '';
             lightboxClose.classList.remove('show');
