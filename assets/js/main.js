@@ -154,6 +154,8 @@ function updateScrollUI() {
     if (backToTopBtn) {
         backToTopBtn.classList.toggle('show', window.scrollY > 300);
     }
+    // 与返回顶部按钮同阈值：Logo 文字随滚动变形为头像
+    document.body.classList.toggle('scrolled', window.scrollY > 300);
 }
 
 function queueScrollUpdate() {

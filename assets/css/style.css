@@ -142,9 +142,16 @@ header {
     justify-content: space-between;
     align-items: center;
     padding: 1rem 2rem;
+    /* Logo 文字/头像纵向平移动画的裁剪边界：整个标题栏内容区（分界线以上）。
+       注意：千万不要给本元素加 position——移动端 .nav-links 下拉菜单的包含块是 header，
+       本元素未定位时它不在裁剪链上，菜单不会被误裁。 */
+    overflow: hidden;
 }
 
 .logo {
+    position: relative; /* 头像绝对定位的参照 */
+    display: inline-flex;
+    align-items: center;
     font-size: 1.5rem;
     font-weight: bold;
     color: var(--primary);
@@ -153,6 +160,33 @@ header {
 }
 .logo:hover {
     text-decoration: none;
+}
+
+/* 滚动后 Logo 文字换成头像：与返回顶部按钮同阈值（body.scrolled，JS 在 scrollY>300 时添加）。
+   纯纵向平移、无透明度渐变；裁剪边界是 .nav-container（整个标题栏分界线以上区域）。
+   文字/头像的偏移量为自身高度的 180%，保证在标题栏内容区内完全滑出、不留下残影。 */
+.logo-text {
+    display: inline-block;
+    transition: transform 0.35s var(--ease);
+}
+.logo-avatar {
+    position: absolute;
+    top: 50%;
+    left: 0; /* 左边缘与 Logo 对齐；导航与内容区同为 1200px + 2rem 内边距，即与下方卡片/标题的左对齐线重合 */
+    width: 38px; /* 固定正方形尺寸 */
+    height: 38px;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border: 3px solid var(--primary);
+    transform: translate(0, calc(-50% + 180%)); /* 平时藏在标题栏裁剪区下方之外 */
+    transition: transform 0.35s var(--ease);
+    pointer-events: none;
+}
+body.scrolled .logo-text {
+    transform: translateY(-180%); /* 完全滑出标题栏上方 */
+}
+body.scrolled .logo-avatar {
+    transform: translate(0, -50%);
 }
 
 .nav-links {
